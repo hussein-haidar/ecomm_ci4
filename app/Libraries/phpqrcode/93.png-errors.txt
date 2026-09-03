@@ -1,0 +1,1 @@
+2025-05-09 22:52:36: imagepng(C:\xampp\htdocs\stok_toko\public\assets/qr_codes/93.png): Failed to open stream: No such file or directory

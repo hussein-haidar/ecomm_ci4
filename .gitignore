@@ -1,0 +1,21 @@
+# Environment & secrets
+.env
+.env.*
+!.env.example
+CREDENTIALS.md
+*.key
+*.pem
+
+# CI4 runtime
+/writable/cache/*
+/writable/logs/*
+/writable/session/*
+/writable/debugbar/*
+/writable/uploads/*
+!/writable/cache/.htaccess
+
+# Vendors / logs / OS
+/vendor/
+*.log
+.DS_Store
+Thumbs.db
