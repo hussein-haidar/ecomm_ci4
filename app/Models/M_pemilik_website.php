@@ -8,7 +8,7 @@ class M_pemilik_website extends Model
 {
     protected $table = 'tbl_website'; // Nama tabel
     protected $primaryKey = 'id_website'; // Primary key
-    protected $allowedFields = ['sesi_user', 'level', 'nama_toko', 'kode_kota', 'nama_kota', 'alamat_pusat', 'alamat_cabang', 'wa_pusat', 'wa_cabang', 'logo_website', 'bgd_web','footer_title','link_IG','link_FB','link_Tiktok','is_checked','updated_at'];
+    protected $allowedFields = ['sesi_user', 'level', 'nama_toko', 'kode_kota', 'nama_kota', 'alamat_pusat', 'alamat_cabang', 'wa_pusat', 'wa_cabang', 'logo_website', 'bgd_web', 'tema_website', 'footer_title','link_IG','link_FB','link_Tiktok','is_checked','updated_at'];
 
     public function get_website()
     {

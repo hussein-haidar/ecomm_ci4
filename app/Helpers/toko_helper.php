@@ -29,6 +29,7 @@ if (!function_exists('get_data_toko')) {
                 'link_Tiktok' => $data[0]['link_Tiktok'],
                 'logo_website' => $data[0]['logo_website'],
                 'bgd_web' => $data[0]['bgd_web'],
+                'tema_website' => $data[0]['tema_website'] ?? 'default',
                 'is_checked' => $data[0]['is_checked']
             ];
         } else {
