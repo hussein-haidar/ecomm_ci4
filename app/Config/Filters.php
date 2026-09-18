@@ -50,6 +50,8 @@ class Filters extends BaseConfig
 					'home_toko/*',     // Sub-rute publik
 					'review',          // Review publik
 					'review/*',        // Review publik
+					'pelanggan_kelola_data/review_get', // Ulasan publik (rating kartu & detail)
+					'pelanggan_kelola_data/review_get/*', // Ulasan publik (rating kartu & detail)
 					'pelanggan_kelola_data/midtrans_notification', // Webhook Midtrans (tanpa session)
 				],
 			],
@@ -59,6 +61,12 @@ class Filters extends BaseConfig
 			'filter_admin' => ['except' => [
 				'home_admin',
 				'home_admin/*',
+				'home_pemilik',
+				'home_pemilik/*',
+				'home_toko',
+				'home_toko/*',
+				'pelanggan_kelola_data/review_get',
+				'pelanggan_kelola_data/review_get/*',
 				'admin_kelola_data',
 				'admin_kelola_data/*',
 				'admin_laporan_mingguan',
@@ -67,22 +75,36 @@ class Filters extends BaseConfig
 				'admin_laporan_bulanan/*',
 				'chat_admin_pembeli',
 				'chat_admin_pembeli/*',
+				'auth',
+				'auth/*',
 			]],
 
 			'filter_pemilik' => ['except' => [
 				'home_pemilik',
 				'home_pemilik/*',
+				'home_admin',
+				'home_admin/*',
+				'home_toko',
+				'home_toko/*',
+				'pelanggan_kelola_data/review_get',
+				'pelanggan_kelola_data/review_get/*',
 				'pemilik_kelola_user',
 				'pemilik_kelola_user/*',
 				'pemilik_kelola_data',
 				'pemilik_kelola_data/*',
 				'pemilik_kelola_website',
 				'pemilik_kelola_website/*',
+				'auth',
+				'auth/*',
 			]],
 
-			'filter_pelanggan' => ['except' => [
+'filter_pelanggan' => ['except' => [
 				'home_toko',
-				'home_toko/*',  
+				'home_toko/*',
+				'home_admin',
+				'home_admin/*',
+				'home_pemilik',
+				'home_pemilik/*',
 				'update_profile',
 				'update_profile/*',
 				'pelanggan_kelola_data',
@@ -91,6 +113,8 @@ class Filters extends BaseConfig
 				'review/*',
 				'chat_admin_pembeli',
 				'chat_admin_pembeli/*',
+				'auth',
+				'auth/*',
 			]],
 
 		],

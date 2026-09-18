@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="<?= base_url() ?>/template_admin/dist/css/AdminLTE.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="<?= base_url('themes/' . ($tokoData['tema_website'] ?? 'default') . '/css/toko.css?v=20260917') ?>">
+    <link rel="stylesheet" href="<?= base_url('themes/' . ($tokoData['tema_website'] ?? 'default') . '/css/toko.css?v=20260919') ?>">
     <link href="<?= base_url() ?>/icon/gudang.ico" rel="shortcut icon">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
     <?= view('layout_toko/v_csrf_script') ?>
@@ -20,8 +20,34 @@
 $jumlahBarang = 0;
 $jumlahBayar = 0;
 $nama_pelanggan = session()->get('nama_pelanggan');
+$nama_lengkap = session()->get('nama_lengkap');
 $sesiUserToko = session()->get('toko_sesi_user');
-$user_logged_in = !empty($nama_pelanggan);
+$is_pelanggan = !empty($nama_pelanggan);
+$user_logged_in = session()->get('user_logged_in') === true || $is_pelanggan || !empty($nama_lengkap);
+$level_user = (int) session()->get('level');
+
+$nama_tampil = '';
+$avatar_src = '';
+$avatar_alt = '';
+if ($is_pelanggan) {
+    $nama_tampil = $nama_pelanggan;
+    $avatar_alt = $nama_pelanggan;
+    $foto = session()->get('foto_pelanggan');
+    if (!empty($foto) && file_exists(FCPATH . 'fotopelanggan/' . $foto)) {
+        $avatar_src = base_url('fotopelanggan/' . $foto);
+    }
+} elseif (!empty($nama_lengkap)) {
+    $nama_tampil = $nama_lengkap;
+    $avatar_alt = $nama_lengkap;
+    $foto = session()->get('foto_user');
+    if (!empty($foto) && file_exists(FCPATH . 'fotouser/' . $foto)) {
+        $avatar_src = base_url('fotouser/' . $foto);
+    }
+}
+$ket_user = '';
+if ($user_logged_in) {
+    $ket_user = $level_user == 1 ? 'Pemilik' : ($level_user == 2 ? 'Admin' : 'Pelanggan');
+}
 
 // Data toko untuk branding
 $tokoData = get_data_toko();
@@ -77,6 +103,17 @@ if (!empty($nama_pelanggan)) {
             <i class="fas fa-search"></i>
         </button>
 
+        <?php if ($user_logged_in): ?>
+        <!-- Mobile User Chip -->
+        <button class="btn-user-chip d-md-none" id="btnUserChip" aria-label="Menu pengguna" aria-expanded="false" onclick="toggleDrawer()">
+            <?php if (!empty($avatar_src)): ?>
+                <img src="<?= $avatar_src ?>" alt="<?= esc($avatar_alt) ?>" class="user-chip-img">
+            <?php else: ?>
+                <i class="fas fa-user"></i>
+            <?php endif; ?>
+        </button>
+        <?php endif; ?>
+
         <!-- Hamburger Menu -->
         <button class="btn-menu-toggle" id="btnMenuToggle" aria-label="Buka menu" aria-expanded="false" aria-controls="mainNav">
             <span class="hamburger"></span>
@@ -91,7 +128,7 @@ if (!empty($nama_pelanggan)) {
                 <a href="<?= base_url('home_toko/login') ?>" class="action-btn primary" title="Masuk">
                     <i class="fas fa-sign-in-alt"></i> <span>Masuk</span>
                 </a>
-            <?php else: ?>
+            <?php elseif ($is_pelanggan): ?>
                 <a href="<?= base_url('pelanggan_kelola_data/keranjang') ?>" class="action-btn cart-btn" title="Keranjang">
                     <i class="fas fa-shopping-cart"></i> <span>Keranjang</span>
                     <?php if ($jumlahBarang > 0): ?><span class="badge-count"><?= $jumlahBarang ?></span><?php endif; ?>
@@ -109,7 +146,12 @@ if (!empty($nama_pelanggan)) {
                 </a>
                 <div class="user-menu">
                     <button class="user-btn" id="userMenuBtn" aria-label="Menu pengguna" aria-expanded="false">
-                        <i class="fas fa-user"></i> <span><?= esc($nama_pelanggan) ?></span> <i class="fas fa-chevron-down"></i>
+                        <?php if (!empty($avatar_src)): ?>
+                            <img src="<?= $avatar_src ?>" alt="<?= esc($avatar_alt) ?>" class="user-avatar-img">
+                        <?php else: ?>
+                            <i class="fas fa-user"></i>
+                        <?php endif; ?>
+                        <span><?= esc($nama_tampil) ?></span> <i class="fas fa-chevron-down"></i>
                     </button>
                     <div class="user-dropdown" id="userDropdown" role="menu">
                         <a href="<?= base_url('pelanggan_kelola_data/profil') ?>" class="dropdown-item" role="menuitem">
@@ -123,9 +165,61 @@ if (!empty($nama_pelanggan)) {
                         </a>
                     </div>
                 </div>
+            <?php else: ?>
+                <div class="user-menu">
+                    <button class="user-btn" id="userMenuBtn" aria-label="Menu pengguna" aria-expanded="false">
+                        <?php if (!empty($avatar_src)): ?>
+                            <img src="<?= $avatar_src ?>" alt="<?= esc($avatar_alt) ?>" class="user-avatar-img">
+                        <?php else: ?>
+                            <i class="fas fa-user"></i>
+                        <?php endif; ?>
+                        <span><?= esc($nama_tampil) ?></span> <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="user-dropdown" id="userDropdown" role="menu">
+                        <a href="<?= base_url($level_user == 1 ? 'home_pemilik' : 'home_admin') ?>" class="dropdown-item" role="menuitem">
+                            <i class="fas fa-tachometer-alt"></i> Dashboard
+                        </a>
+                        <a href="<?= base_url('auth/logout_user') ?>" class="dropdown-item text-danger" role="menuitem">
+                            <i class="fas fa-sign-out-alt"></i> Keluar
+                        </a>
+                    </div>
+                </div>
             <?php endif; ?>
         </div>
     </div>
+
+    <!-- Desktop Navigation Menu -->
+    <nav class="header-nav" aria-label="Menu utama">
+        <ul class="header-nav-list">
+            <li class="header-nav-item">
+                <a href="<?= base_url('home_toko/index') ?>" class="header-nav-link">
+                    <i class="fas fa-home"></i> Beranda
+                </a>
+            </li>
+            <li class="header-nav-item">
+                <a href="<?= base_url('home_toko/katalog') ?>" class="header-nav-link">
+                    <i class="fas fa-th-large"></i> Katalog Produk
+                </a>
+            </li>
+            <li class="header-nav-item header-nav-dropdown">
+                <button type="button" class="header-nav-link header-nav-toggle" aria-expanded="false" aria-label="Jenis Produk">
+                    <i class="fas fa-tags"></i> Jenis Produk <i class="fas fa-chevron-down header-nav-caret"></i>
+                </button>
+                <ul class="header-nav-submenu" role="menu">
+                    <?php foreach ($jenis_produk_dropdown as $jenis): ?>
+                        <li>
+                            <a href="<?= base_url('home_toko/jenis_produk/' . urlencode($jenis['jenis_produk'])) ?>" class="header-nav-sublink" role="menuitem">
+                                <?= esc($jenis['jenis_produk']) ?>
+                            </a>
+                        </li>
+                    <?php endforeach; ?>
+                    <?php if (empty($jenis_produk_dropdown)): ?>
+                        <li class="header-nav-empty">Belum ada kategori</li>
+                    <?php endif; ?>
+                </ul>
+            </li>
+        </ul>
+    </nav>
 
     <!-- Mobile Drawer -->
     <nav id="mainNav" class="nav-drawer" role="navigation" aria-label="Menu utama">
@@ -217,13 +311,18 @@ if (!empty($nama_pelanggan)) {
                     <h3 class="drawer-section-title">Akun Saya</h3>
                     <div class="drawer-user-info">
                         <div class="user-avatar">
-                            <i class="fas fa-user-circle"></i>
+                            <?php if (!empty($avatar_src)): ?>
+                                <img src="<?= $avatar_src ?>" alt="<?= esc($avatar_alt) ?>" class="user-avatar-img">
+                            <?php else: ?>
+                                <i class="fas fa-user-circle"></i>
+                            <?php endif; ?>
                         </div>
                         <div class="user-detail">
-                            <strong><?= esc($nama_pelanggan) ?></strong>
-                            <small><?= esc(session()->get('email') ?? '') ?></small>
+                            <strong><?= esc($nama_tampil) ?></strong>
+                            <small><?= esc($is_pelanggan ? (session()->get('email') ?? '') : ($ket_user ?: '')) ?></small>
                         </div>
                     </div>
+                    <?php if ($is_pelanggan): ?>
                     <ul class="drawer-menu">
                         <li>
                             <a href="<?= base_url('pelanggan_kelola_data/keranjang') ?>" class="drawer-link">
@@ -259,6 +358,20 @@ if (!empty($nama_pelanggan)) {
                             </a>
                         </li>
                     </ul>
+                    <?php else: ?>
+                    <ul class="drawer-menu">
+                        <li>
+                            <a href="<?= base_url($level_user == 1 ? 'home_pemilik' : 'home_admin') ?>" class="drawer-link">
+                                <i class="fas fa-tachometer-alt"></i> <span>Dashboard</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="<?= base_url('auth/logout_user') ?>" class="drawer-link danger">
+                                <i class="fas fa-sign-out-alt"></i> <span>Keluar</span>
+                            </a>
+                        </li>
+                    </ul>
+                    <?php endif; ?>
                 </div>
             <?php endif; ?>
 
@@ -293,26 +406,29 @@ if (!empty($nama_pelanggan)) {
     </div>
 </header>
 
-<!-- Modal Filter (existing, unchanged) -->
+<!-- Modal Filter -->
 <div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="filterModalLabel">Filter Produk</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content filter-panel">
+            <div class="modal-header filter-panel-header">
+                <h5 class="modal-title" id="filterModalLabel"><i class="fas fa-filter"></i> Filter Produk</h5>
+                <button type="button" class="filter-close" data-bs-dismiss="modal" aria-label="Close"><i class="fas fa-times"></i></button>
             </div>
 
-            <div class="modal-body">
+            <div class="modal-body filter-panel-body">
                 <form id="product-filter-form" method="GET" action="<?= base_url('home_toko/katalog') ?>">
-                    <div class="mb-3">
-                        <label for="keyword">Cari Kata</label>
-                        <input type="text" name="keyword" id="keyword" class="form-control" placeholder="Cari..." value="<?= esc($filter_params['keyword'] ?? '') ?>">
+
+                    <!-- Cari Kata -->
+                    <div class="filter-group">
+                        <label for="keyword" class="filter-label">Cari Kata</label>
+                        <input type="text" name="keyword" id="keyword" class="filter-control" placeholder="Cari produk..." value="<?= esc($filter_params['keyword'] ?? '') ?>">
                     </div>
 
-                    <div class="mb-3">
-                        <label for="jenis_produk">Jenis Produk</label>
-                        <select name="jenis_produk" id="jenis_produk" class="form-control">
-                            <option value="">Pilih Kategori</option>
+                    <!-- Jenis Produk -->
+                    <div class="filter-group">
+                        <label for="jenis_produk" class="filter-label">Jenis Produk</label>
+                        <select name="jenis_produk" id="jenis_produk" class="filter-control">
+                            <option value="">Semua Kategori</option>
                             <?php foreach ($jenis_produk_dropdown as $jenis): ?>
                                 <option value="<?= esc($jenis['jenis_produk']) ?>" <?= (isset($filter_params['jenis_produk']) && $filter_params['jenis_produk'] == $jenis['jenis_produk']) ? 'selected' : '' ?>>
                                     <?= esc($jenis['jenis_produk']) ?>
@@ -321,58 +437,70 @@ if (!empty($nama_pelanggan)) {
                         </select>
                     </div>
 
-                    <div class="mb-3">
-                        <label>Rentang Harga</label>
-                        <div class="input-group">
-                            <span class="input-group-text">Rp.</span>
-                            <input type="number" name="harga_min" class="form-control" placeholder="Min" value="<?= esc($filter_params['harga_min'] ?? '') ?>">
-                            <span class="input-group-text">-</span>
-                            <span class="input-group-text">Rp.</span>
-                            <input type="number" name="harga_max" class="form-control" placeholder="Max" value="<?= esc($filter_params['harga_max'] ?? '') ?>">
+                    <!-- Rentang Harga -->
+                    <div class="filter-group">
+                        <span class="filter-label">Rentang Harga</span>
+                        <div class="filter-price-row">
+                            <div class="filter-price-field">
+                                <span class="filter-price-code">Rp</span>
+                                <input type="number" name="harga_min" class="filter-price-input" placeholder="Min" value="<?= esc($filter_params['harga_min'] ?? '') ?>">
+                            </div>
+                            <span class="filter-price-sep">–</span>
+                            <div class="filter-price-field">
+                                <span class="filter-price-code">Rp</span>
+                                <input type="number" name="harga_max" class="filter-price-input" placeholder="Max" value="<?= esc($filter_params['harga_max'] ?? '') ?>">
+                            </div>
                         </div>
                     </div>
 
-                    <div class="mb-3">
-                        <label>Urutkan Berdasarkan Harga</label>
-                        <select name="sort_harga" class="form-control">
+                    <!-- Urutkan Berdasarkan Harga -->
+                    <div class="filter-group">
+                        <label for="sort_harga" class="filter-label">Urutkan Berdasarkan Harga</label>
+                        <select name="sort_harga" id="sort_harga" class="filter-control">
                             <option value="">Default</option>
                             <option value="asc" <?= ($filter_params['sort_harga'] ?? '') == 'asc' ? 'selected' : '' ?>>Harga Terendah</option>
                             <option value="desc" <?= ($filter_params['sort_harga'] ?? '') == 'desc' ? 'selected' : '' ?>>Harga Tertinggi</option>
                         </select>
                     </div>
 
-                    <div class="mb-3">
-                        <label>Sorting Nama</label>
-                        <select name="sort_nama" class="form-control">
+                    <!-- Sorting Nama -->
+                    <div class="filter-group">
+                        <label for="sort_nama" class="filter-label">Sorting Nama</label>
+                        <select name="sort_nama" id="sort_nama" class="filter-control">
                             <option value="">Pilih Urutan</option>
                             <option value="a-z" <?= ($filter_params['sort_nama'] ?? '') == 'a-z' ? 'selected' : '' ?>>A - Z</option>
                             <option value="z-a" <?= ($filter_params['sort_nama'] ?? '') == 'z-a' ? 'selected' : '' ?>>Z - A</option>
                         </select>
                     </div>
 
-                    <div class="mb-3">
-                        <label>Rating Minimum</label>
+                    <!-- Rating Minimum -->
+                    <div class="filter-group">
+                        <span class="filter-label">Rating Minimum</span>
                         <div class="star-rating-filter">
                             <?php for ($i = 5; $i >= 1; $i--): ?>
-                                <button type="button" class="star-btn <?= (isset($filter_params['rating_min']) && $filter_params['rating_min'] == $i) ? 'active' : '' ?>" 
-                                        data-rating="<?= $i ?>" 
+                                <button type="button" class="star-btn <?= (isset($filter_params['rating_min']) && $filter_params['rating_min'] == $i) ? 'active' : '' ?>"
+                                        data-rating="<?= $i ?>"
                                         onclick="setRatingFilter(this, <?= $i ?>)"
                                         aria-label="<?= $i ?> bintang">
                                     <i class="fas fa-star"></i>
                                 </button>
                             <?php endfor; ?>
                             <input type="hidden" name="rating_min" id="rating_min" value="<?= esc($filter_params['rating_min'] ?? '') ?>">
-                            <button type="button" class="btn btn-sm btn-outline-secondary ms-2" onclick="clearRatingFilter()">Hapus</button>
+                            <button type="button" class="filter-btn-clear" onclick="clearRatingFilter()">Hapus</button>
                         </div>
-                        <small class="form-text text-muted">Klik bintang untuk set rating minimum (1-5)</small>
+                        <small class="filter-hint">Klik bintang untuk set rating minimum (1-5)</small>
                     </div>
 
-                    <button type="submit" class="btn btn-primary w-100">Terapkan Filter</button>
-                    <a href="<?= base_url('home_toko/katalog') ?>" class="btn btn-secondary w-100 mt-2">Reset Filter</a>
+                    <!-- Aksi -->
+                    <div class="filter-actions">
+                        <button type="submit" class="filter-btn filter-btn-primary"><i class="fas fa-check"></i> Terapkan Filter</button>
+                        <a href="<?= base_url('home_toko/katalog') ?>" class="filter-btn filter-btn-secondary"><i class="fas fa-redo"></i> Reset Filter</a>
+                    </div>
                 </form>
             </div>
         </div>
     </div>
+</div>
 
 <!-- Include chat popup if exists -->
 <?php if (file_exists(APPPATH . 'Views/layout_toko/v_chat_popup.php')): ?>
