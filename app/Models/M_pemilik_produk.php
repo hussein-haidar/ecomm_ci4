@@ -41,14 +41,16 @@ protected $allowedFields = [
             ->get()->getResultArray();
     }
 
-    public function get_carousel()
+    public function get_carousel($sesi_user = null)
     {
-        $sesi_user = session()->get('sesi_user');
+        if ($sesi_user === null) {
+            $sesi_user = session()->get('sesi_user');
+        }
         return $this->db->table($this->table)
             ->select('tbl_data_produk.*, tbl_varian_produk.varian_produk, tbl_jenis_produk.jenis_produk')
             ->join('tbl_varian_produk', 'tbl_varian_produk.id_varian = tbl_data_produk.id_varian', 'left')
             ->join('tbl_jenis_produk', 'tbl_jenis_produk.id_jenis = tbl_data_produk.id_jenis', 'left')
-            ->where('tbl_data_produk.deleted_at', 0) // Hanya ambil data yang belum dihapus
+            ->where('tbl_data_produk.deleted_at', 0)
             ->where('tbl_data_produk.sesi_user', $sesi_user)
             ->where('tbl_data_produk.checked', 1)
             ->orderBy('id_produk', 'DESC')

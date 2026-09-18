@@ -1,4 +1,21 @@
-  <?php foreach ($produk_data as $produk) : ?>
+  <?php
+      function renderBintangServer($rating)
+      {
+          $s = '';
+          $val = round($rating * 2) / 2;
+          for ($i = 1; $i <= 5; $i++) {
+              if ($val >= $i) {
+                  $s .= '<i class="fa fa-star text-warning" style="font-size:14px;"></i>';
+              } elseif ($val === $i - 0.5) {
+                  $s .= '<i class="fas fa-star-half-alt text-warning" style="font-size:14px;"></i>';
+              } else {
+                  $s .= '<i class="far fa-star text-muted" style="font-size:14px;"></i>';
+              }
+          }
+          return $s;
+      }
+      ?>
+      <?php foreach ($produk_data as $produk) : ?>
       <div class="product-item" data-nama-produk="<?= esc($produk['nama_produk']) ?>">
           <img src="<?= base_url('fotoproduk/' . $produk['foto_produk']) ?>" alt="<?= $produk['foto_produk']; ?>">
           <h4><?= $produk['nama_produk']; ?></h4>
@@ -11,7 +28,19 @@
               <?= esc($produk['satuan_produk']) ?>
           </p>
           <p class="produk"><strong>Price :</strong>Rp. <?= number_format($produk['harga_produk'], 0, ',', '.') ?></p>
-          <div class="rating-katalog mb-1"></div>
+          <div class="rating-katalog mb-1">
+              <?php if (!empty($produk['rating_summary']) && $produk['rating_summary']['total'] > 0): ?>
+                  <?php $avg = (float)$produk['rating_summary']['rata_rata']; ?>
+                  <?= renderBintangServer($avg) ?>
+                  <strong><?= number_format($avg, 1) ?></strong>
+                  <small class="text-muted">(<?= (int)$produk['rating_summary']['total'] ?> ulasan)</small>
+                  <?php if ($avg >= 4.5): ?>
+                      <span class="rating-badge-top"><i class="fa fa-thumbs-up"></i> Terbaik</span>
+                  <?php endif; ?>
+              <?php else: ?>
+                  <small class="text-muted"><i class="far fa-star"></i> Belum ada ulasan</small>
+              <?php endif; ?>
+          </div>
           <a href="<?= base_url('home_toko/detail_produk/' . $produk['nama_produk']) ?>" class="btn btn-success"><i class="fa fa-fw fa-eye"></i>&nbsp;Detail</a>
 
           <?php if ($user_logged_in): ?>
@@ -23,7 +52,7 @@
                   <input type="hidden" name="harga_produk" value="<?= $produk['harga_produk'] ?>">
                   <input type="hidden" name="berat_produk" value="<?= $produk['berat_produk'] ?>">
 
-                  <select id="ukuran_produk" name="ukuran_produk" class="form-control profile" style="width: auto" required>
+                  <select id="ukuran_produk_<?= esc($produk['id_stok']) ?>" name="ukuran_produk" class="form-control profile" style="width: auto" required>
                       <option value="">--Pilih Ukuran--</option>
                       <?php foreach ($produk['ukuran_list'] as $ukuran): ?>
                           <option value=" <?= esc($ukuran) ?>"><?= esc($ukuran) ?></option>
@@ -49,7 +78,7 @@
                   <input type="hidden" name="satuan_produk" value="<?= $produk['satuan_produk']; ?>">
                   <input type="hidden" name="harga_produk" value="<?= $produk['harga_produk'] ?>">
 
-                  <select id="ukuran_produk" name="ukuran_produk" class="form-control profile" style="width: auto" disabled>
+                  <select id="ukuran_produk_<?= esc($produk['id_stok']) ?>" name="ukuran_produk" class="form-control profile" style="width: auto" disabled>
                       <option value="">--Pilih Ukuran--</option>
                       <?php foreach ($produk['ukuran_list'] as $ukuran): ?>
                           <option value=" <?= esc($ukuran) ?>"><?= esc($ukuran) ?></option>
@@ -111,6 +140,8 @@
 
       function muatRatingKatalog() {
           document.querySelectorAll('.rating-katalog').forEach(function(el) {
+              // Skip jika sudah di-render server-side (punya child elements)
+              if (el.children.length > 0) return;
               const card = el.closest('[data-nama-produk]');
               if (!card) return;
               const nama = card.getAttribute('data-nama-produk');
@@ -140,6 +171,6 @@
       muatStok();
       muatRatingKatalog();
 
-      // Auto-refresh setiap 1 detik (10000 ms)
-      setInterval(muatStok, 1000);
+      // Auto-refresh setiap 10 detik
+      setInterval(muatStok, 10000);
   </script>

@@ -25,7 +25,6 @@ class Home_toko extends BaseController
     {
         $session = session();
 
-        // Jika belum pilih toko, redirect ke halaman pilih toko
         if (!$session->get('toko_sesi_user')) {
             return redirect()->to(base_url('auth/pilih_toko'));
         }
@@ -40,11 +39,20 @@ class Home_toko extends BaseController
             $produk['ukuran_list'] = explode('-', $produk['ukuran_produk']);
         }
 
+        // Fetch rating summaries for all products (batch)
+        $reviewModel = new \App\Models\M_review();
+        $namaProdukList = array_column($produk_data, 'nama_produk');
+        $ratingMap = $reviewModel->get_rating_summary_batch($sesi_user, $namaProdukList);
+
+        foreach ($produk_data as &$produk) {
+            $produk['rating_summary'] = $ratingMap[$produk['nama_produk']] ?? null;
+        }
+
         $data = [
             'produk_data' => $produk_data,
             'title2' => 'Katalog Produk',
             'jenis_produk_dropdown' => $produkModel->getJenisProdukDropdown($sesi_user),
-            'data_produk' => $this->M_pemilik_produk->get_carousel(),
+            'data_produk' => $this->M_pemilik_produk->get_carousel($sesi_user),
             'user_logged_in' => $session->get('user_logged_in') === true,
         ];
 
@@ -87,6 +95,15 @@ class Home_toko extends BaseController
             $produk['ukuran_list'] = explode('-', $produk['ukuran_produk']);
         }
 
+        // Fetch rating summaries for all products (batch)
+        $reviewModel = new \App\Models\M_review();
+        $namaProdukList = array_column($produk_data, 'nama_produk');
+        $ratingMap = $reviewModel->get_rating_summary_batch($sesi_user, $namaProdukList);
+
+        foreach ($produk_data as &$produk) {
+            $produk['rating_summary'] = $ratingMap[$produk['nama_produk']] ?? null;
+        }
+
         $nama_pelanggan = $session->get('nama_pelanggan');
 
         // Trigger hanya jika ada nama_pelanggan
@@ -126,8 +143,13 @@ class Home_toko extends BaseController
         $produkModel = new \App\Models\M_home_toko();
         $produk_data = $produkModel->getProdukByJenis($sesi_user, $jenis_produk, $keyword);
 
+        // Fetch rating summaries for all products (batch)
+        $reviewModel = new \App\Models\M_review();
+        $namaProdukList = array_column($produk_data, 'nama_produk');
+        $ratingMap = $reviewModel->get_rating_summary_batch($sesi_user, $namaProdukList);
+
         foreach ($produk_data as &$produk) {
-            $produk['ukuran_list'] = explode('-', $produk['ukuran_produk']);
+            $produk['rating_summary'] = $ratingMap[$produk['nama_produk']] ?? null;
         }
 
         $data = [

@@ -124,25 +124,72 @@ class M_home_toko extends Model
 
     public function getProdukByJenis($sesi_user, $jenis_produk, $keyword)
     {
-        return $this->db->table('tbl_stok_produk')
-            ->select('tbl_stok_produk.id_stok, tbl_stok_produk.nama_produk, tbl_stok_produk.ukuran_produk, tbl_stok_produk.satuan_produk, 
-            tbl_stok_produk.jumlah_stok_produk, tbl_data_produk.harga_produk, tbl_data_produk.foto_produk, tbl_data_produk.berat_produk') // <== tambahkan ini
+        $builder = $this->db->table('tbl_stok_produk')
+            ->select('tbl_stok_produk.*, tbl_data_produk.harga_produk, tbl_data_produk.foto_produk, tbl_data_produk.berat_produk')
             ->join('tbl_data_produk', 'tbl_stok_produk.nama_produk = tbl_data_produk.nama_produk')
             ->where('tbl_stok_produk.sesi_user', $sesi_user)
-            ->where('tbl_stok_produk.jenis_produk', $jenis_produk)
-            ->groupStart()
-            ->like('tbl_stok_produk.nama_produk', $keyword)
-            ->orLike('tbl_stok_produk.jenis_produk', $keyword)
-            ->groupEnd()
-            ->groupBy('tbl_stok_produk.nama_produk')
-            ->get()
-            ->getResultArray();
+            ->where('tbl_stok_produk.jenis_produk', $jenis_produk);
+
+        if (!empty($keyword)) {
+            $builder->groupStart()
+                ->like('tbl_stok_produk.nama_produk', $keyword)
+                ->orLike('tbl_stok_produk.jenis_produk', $keyword)
+                ->groupEnd();
+        }
+
+        $builder->orderBy('tbl_stok_produk.id_stok', 'ASC');
+
+        $query = $builder->get();
+        $produk_data = $query->getResultArray();
+
+        // Kelompokkan berdasarkan nama_produk (sama seperti getProduk)
+        $grouped = [];
+
+        foreach ($produk_data as $item) {
+            $key = $item['nama_produk'];
+
+            if (!isset($grouped[$key])) {
+                $grouped[$key] = [];
+            }
+
+            $grouped[$key][] = $item;
+        }
+
+        // Filter tiap kelompok - ambil stok pertama yang tersedia (jumlah > 0)
+        $result = [];
+
+        foreach ($grouped as $nama_produk => $items) {
+            usort($items, function ($a, $b) {
+                return $a['id_stok'] <=> $b['id_stok'];
+            });
+
+            $stok_aktif = null;
+
+            foreach ($items as $item) {
+                if ($item['jumlah_stok_produk'] > 0) {
+                    $stok_aktif = $item;
+                    break;
+                }
+            }
+
+            if ($stok_aktif !== null) {
+                $stok_aktif['ukuran_list'] = explode('-', $stok_aktif['ukuran_produk']);
+                $result[] = $stok_aktif;
+            }
+        }
+
+        return $result;
     }
 
     public function detailStok($nama_produk, $id_stok = null)
     {
         $builder = $this->db->table('tbl_stok_produk')
-            ->select('tbl_stok_produk.nama_produk, tbl_data_produk.*, SUM(tbl_stok_produk.jumlah_stok_produk) as total_stok')
+            ->select("tbl_data_produk.*,
+                      MIN(tbl_stok_produk.id_stok) AS id_stok,
+                      SUM(tbl_stok_produk.jumlah_stok_produk) AS jumlah_stok_produk,
+                      SUM(tbl_stok_produk.jumlah_stok_produk) AS total_stok,
+                      MAX(tbl_stok_produk.satuan_produk) AS satuan_produk,
+                      MAX(tbl_stok_produk.jenis_produk) AS jenis_produk")
             ->join('tbl_data_produk', 'tbl_data_produk.nama_produk = tbl_stok_produk.nama_produk', 'left')
             ->where('tbl_stok_produk.nama_produk', $nama_produk);
 

@@ -125,6 +125,9 @@ if (!empty($nama_pelanggan)) {
                 <a href="<?= base_url('auth/pilih_toko') ?>" class="action-btn" title="Pilih Toko">
                     <i class="fas fa-store"></i> <span>Pilih Toko</span>
                 </a>
+                <a href="<?= base_url('auth/buka_toko') ?>" class="action-btn" title="Buka Toko Baru">
+                    <i class="fas fa-store-alt"></i> <span>Buka Toko</span>
+                </a>
                 <a href="<?= base_url('home_toko/login') ?>" class="action-btn primary" title="Masuk">
                     <i class="fas fa-sign-in-alt"></i> <span>Masuk</span>
                 </a>
@@ -296,6 +299,11 @@ if (!empty($nama_pelanggan)) {
                         <li>
                             <a href="<?= base_url('home_toko/login') ?>" class="drawer-link primary">
                                 <i class="fas fa-sign-in-alt"></i> <span>Login</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="<?= base_url('auth/buka_toko') ?>" class="drawer-link">
+                                <i class="fas fa-store-alt"></i> <span>Buka Toko</span>
                             </a>
                         </li>
                         <li>

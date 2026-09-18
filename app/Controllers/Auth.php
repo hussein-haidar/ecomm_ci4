@@ -124,6 +124,127 @@ class Auth extends BaseController
         }
     }
 
+    public function buka_toko()
+    {
+        $data = [
+            'title' => 'Buka Toko',
+            'title2' => 'Buka Toko',
+        ];
+        return view('pelanggan/auth_login/v_buka_toko', $data);
+    }
+
+    public function save_buka_toko()
+    {
+        if ($this->validate([
+            'username' => [
+                'label' => 'Username',
+                'rules' => 'required|min_length[4]',
+                'errors' => [
+                    'required' => '{field} Wajib Diisi !!!',
+                    'min_length' => '{field} Minimal 4 Karakter !'
+                ]
+            ],
+            'password' => [
+                'label' => 'Kata Sandi',
+                'rules' => 'required|min_length[4]',
+                'errors' => [
+                    'required' => '{field} Wajib Diisi !!!',
+                    'min_length' => '{field} Minimal 4 Karakter !'
+                ]
+            ],
+            'nama_lengkap' => [
+                'label' => 'Nama Lengkap Pemilik',
+                'rules' => 'required',
+                'errors' => ['required' => '{field} Wajib Diisi !!!']
+            ],
+            'nama_toko' => [
+                'label' => 'Nama Toko',
+                'rules' => 'required',
+                'errors' => ['required' => '{field} Wajib Diisi !!!']
+            ],
+        ])) {
+            $username = $this->request->getPost('username');
+            $namaLengkap = trim($this->request->getPost('nama_lengkap'));
+
+            // Cek duplikasi username
+            if ($this->M_profil_user->findByUsername($username)) {
+                session()->setFlashdata('errors', ['Username "' . $username . '" sudah terdaftar!']);
+                return redirect()->to(base_url('auth/buka_toko'));
+            }
+
+            // Cek duplikasi sesi_user (nama_lengkap dipakai sebagai penanda toko)
+            if ($this->M_profil_user->get_user_by_id($namaLengkap)) {
+                session()->setFlashdata('errors', ['Nama lengkap "' . $namaLengkap . '" sudah terdaftar. Gunakan nama lain.']);
+                return redirect()->to(base_url('auth/buka_toko'));
+            }
+
+            // Foto user bersifat opsional
+            $foto = $this->request->getFile('foto_user');
+            $nama_file = '';
+            if ($foto && $foto->isValid() && !$foto->hasMoved()) {
+                $nama_file = $foto->getRandomName();
+                $foto->move('fotouser', $nama_file);
+            }
+
+            // 1) Buat akun user pemilik (level 1)
+            $idUser = $this->M_profil_user->insert([
+                'sesi_user' => $namaLengkap,
+                'username' => $username,
+                'password' => $this->request->getPost('password'),
+                'nama_lengkap' => $namaLengkap,
+                'nama_title' => $this->request->getPost('nama_title') ?: 'Dashboard Pemilik',
+                'notelpon_user' => $this->request->getPost('notelpon_user'),
+                'jobdesk_user' => $this->request->getPost('jobdesk_user') ?: 'Pemilik',
+                'level' => 1,
+                'foto_user' => $nama_file,
+                'last_login' => date('Y-m-d H:i:s'),
+            ]);
+
+            // 2) Auto-buat data toko (tema default, langsung aktif / is_checked=2)
+            $websiteModel = new \App\Models\M_pemilik_website();
+            $websiteModel->add([
+                'sesi_user' => $namaLengkap,
+                'level' => 1,
+                'nama_toko' => $this->request->getPost('nama_toko'),
+                'alamat_pusat' => $this->request->getPost('alamat_pusat') ?? '',
+                'wa_pusat' => $this->request->getPost('wa_pusat') ?? '',
+                'footer_title' => $this->request->getPost('nama_toko'),
+                'tema_website' => 'default',
+                'is_checked' => 2,
+            ]);
+
+            // Bersihkan sisa session pelanggan agar tidak tercampur
+            session()->remove([
+                'nama_pelanggan', 'id_pelanggan', 'email', 'jenis_kelamin',
+                'no_telpon', 'tanggal_lahir', 'longitude', 'latitude',
+                'alamat', 'foto_pelanggan', 'kode_kota', 'nama_kota'
+            ]);
+
+            // 3) Langsung login sebagai pemilik ke toko barunya
+            session()->set([
+                'id_user' => $idUser,
+                'username' => $username,
+                'nama_lengkap' => $namaLengkap,
+                'sesi_user' => $namaLengkap,
+                'nama_title' => $this->request->getPost('nama_title') ?: 'Dashboard Pemilik',
+                'notelpon_user' => $this->request->getPost('notelpon_user'),
+                'jobdesk_user' => $this->request->getPost('jobdesk_user') ?: 'Pemilik',
+                'foto_user' => $nama_file,
+                'level' => 1,
+                'user_logged_in' => true,
+                'log' => true,
+                'toko_sesi_user' => $namaLengkap,
+            ]);
+
+            session()->setFlashdata('pesan_welcome', 'Selamat Datang, ' . $namaLengkap . '! Toko Anda aktif dan siap dikelola.');
+            return redirect()->to(base_url('home_pemilik'));
+        } else {
+            // Jika tidak valid
+            session()->setFlashdata('errors', \Config\Services::validation()->getErrors());
+            return redirect()->to(base_url('auth/buka_toko'));
+        }
+    }
+
     public function login_user()
     {
         // Jika belum pilih toko, redirect ke pilih toko
@@ -439,10 +560,14 @@ class Auth extends BaseController
                     // Update waktu login terakhir
                     $this->M_profil_pelanggan->updateLastLogin($user['id_pelanggan']);
 
-                    session()->setFlashdata('pesan_welcome', 'Selamat Datang, ' . $user['nama_pelanggan'] . '!');
+session()->setFlashdata('pesan_welcome', 'Selamat Datang, ' . $user['nama_pelanggan'] . '!');
 
-                    // Redirect ke pemilihan toko
-                    return redirect()->to(base_url('auth/pilih_toko'));
+        // Redirect ke toko yang sudah dipilih, atau pilih toko jika belum
+        $redirectUrl = session()->get('toko_sesi_user')
+            ? base_url('home_toko/index')
+            : base_url('auth/pilih_toko');
+
+        return redirect()->to($redirectUrl);
                 } else {
                     // Password salah
                     session()->setFlashdata('pesan_warning', 'Login Gagal, Password Salah!');
@@ -533,7 +658,7 @@ class Auth extends BaseController
     public function login_google()
     {
         $clientId = env('google.clientId', '') ?? '';
-        $redirectUri = base_url('auth/google_callback');
+        $redirectUri = base_url('auth/google/callback');
         $scope = 'email profile';
 
         $url = 'https://accounts.google.com/o/oauth2/v2/auth'
@@ -557,7 +682,7 @@ class Auth extends BaseController
 
         $clientId     = env('google.clientId', '') ?? '';
         $clientSecret = env('google.clientSecret', '') ?? '';
-        $redirectUri  = base_url('auth/google_callback');
+        $redirectUri  = base_url('auth/google/callback');
 
         // Tukar authorization code dengan access token
         $tokenData = $this->exchangeCodeForToken($code, $clientId, $clientSecret, $redirectUri);
@@ -658,7 +783,20 @@ class Auth extends BaseController
 
         session()->setFlashdata('pesan_welcome', 'Selamat Datang, ' . $pelanggan['nama_pelanggan'] . '!');
 
-        return redirect()->to(base_url('auth/pilih_toko'));
+        // Redirect ke toko yang sudah dipilih, atau pilih toko jika belum
+        $redirectUrl = session()->get('toko_sesi_user')
+            ? base_url('home_toko/index')
+            : base_url('auth/pilih_toko');
+
+        return redirect()->to($redirectUrl);
+    }
+
+    public function csrf()
+    {
+        return $this->response
+            ->setStatusCode(200)
+            ->setContentType('application/json')
+            ->setBody(json_encode(['token' => csrf_hash()]));
     }
 
     public function pilih_toko()
