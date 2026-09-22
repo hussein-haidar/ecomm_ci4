@@ -59,16 +59,31 @@
                              <i class="fa fa-angle-left pull-right"></i>
                          </span>
                      </a>
-                     <ul class="treeview-menu">
-                         <li><a href="<?= base_url('pemilik_kelola_data/jenis') ?>"><i class="fa fa-circle-o"></i>Data Jenis Produk</a></li>
-                         <?php if (getUserPreference('tampilkan_varian')) : ?>
-                             <li><a href="<?= base_url('pemilik_kelola_data/varian') ?>"><i class="fa fa-circle-o"></i>Data Varian Produk</a></li>
-                         <?php endif; ?>
-                         <li><a href="<?= base_url('pemilik_kelola_data/satuan_produk') ?>"><i class="fa fa-circle-o"></i>Data Satuan Produk</a></li>
-                         <li><a href="<?= base_url('pemilik_kelola_data/produk') ?>"><i class="fa fa-circle-o"></i>Data Produk</a></li>
-                         <li><a href="<?= base_url('pemilik_kelola_data/bank') ?>"><i class="fa fa-circle-o"></i>Data Bank</a></li>
-                     </ul>
-                 </li>
+<ul class="treeview-menu">
+                          <li><a href="<?= base_url('pemilik_kelola_data/jenis') ?>"><i class="fa fa-circle-o"></i>Data Jenis Produk</a></li>
+                          <?php if (getUserPreference('tampilkan_varian')) : ?>
+                              <li><a href="<?= base_url('pemilik_kelola_data/varian') ?>"><i class="fa fa-circle-o"></i>Data Varian Produk</a></li>
+                          <?php endif; ?>
+                          <li><a href="<?= base_url('pemilik_kelola_data/satuan_produk') ?>"><i class="fa fa-circle-o"></i>Data Satuan Produk</a></li>
+                          <li><a href="<?= base_url('pemilik_kelola_data/produk') ?>"><i class="fa fa-circle-o"></i>Data Produk</a></li>
+                          <li><a href="<?= base_url('pemilik_kelola_data/bank') ?>"><i class="fa fa-circle-o"></i>Data Bank</a></li>
+                      </ul>
+                  </li>
+
+                  <li class="header">PROMO NAVIGATION</li>
+                  <li class="treeview">
+                      <a href="#">
+                          <i class="fa fa-bullhorn"></i>
+                          <span>Banner Promo</span>
+                          <span class="pull-right-container">
+                              <i class="fa fa-angle-left pull-right"></i>
+                          </span>
+                      </a>
+                      <ul class="treeview-menu">
+                          <li><a href="<?= base_url('pemilik_kelola_data/banner') ?>"><i class="fa fa-circle-o"></i>Data Banner Promo</a></li>
+                          <li><a href="<?= base_url('pemilik_kelola_data/data_dihapus_banner') ?>"><i class="fa fa-circle-o"></i>Banner Dihapus</a></li>
+                      </ul>
+                  </li>
 
 
                  <li class="header">SETTING NAVIGATION</li>

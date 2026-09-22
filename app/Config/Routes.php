@@ -25,6 +25,8 @@ $routes->set404Override();
 
 $routes->setAutoRoute(true);
 
+$routes->get('auth/google/callback', 'Auth::google_callback');
+
 
 /*
  * --------------------------------------------------------------------

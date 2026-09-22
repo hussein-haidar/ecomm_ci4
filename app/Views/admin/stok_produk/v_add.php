@@ -20,6 +20,7 @@
                 <?php endif; ?>
 
                 <form action="<?= base_url('admin_kelola_data/save_stok') ?>" method="post" enctype="multipart/form-data">
+                    <?= csrf_field() ?>
                     <input type="hidden" name="sesi_user" value="<?= esc($sesi_user) ?>" readonly>
 
                     <div class="form-group">

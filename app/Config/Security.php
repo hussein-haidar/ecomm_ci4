@@ -15,7 +15,7 @@ class Security extends BaseConfig
      *
      * @var string 'cookie' or 'session'
      */
-    public string $csrfProtection = 'cookie';
+    public string $csrfProtection = 'session';
 
     /**
      * --------------------------------------------------------------------------
@@ -84,8 +84,13 @@ class Security extends BaseConfig
      * --------------------------------------------------------------------------
      *
      * Redirect to previous page with error on failure.
+     *
+     * Diset true agar saat token CSRF tidak valid (sesi kedaluwarsa, token lama,
+     * dsb.) pengguna dialihkan kembali ke halaman dengan token baru dan pesan
+     * error, BUKAN halaman 403 "The action you requested is not allowed".
+     * (Meniru perilaku Laravel yang me-redirect form saat CSRF gagal.)
      */
-    public bool $redirect = false;
+    public bool $redirect = true;
 
     /**
      * --------------------------------------------------------------------------

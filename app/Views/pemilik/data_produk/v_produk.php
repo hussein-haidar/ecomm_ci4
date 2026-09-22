@@ -56,6 +56,7 @@
               <td><?= $value['deskripsi_produk']; ?></td>
               <td>
                 <form action="<?= base_url('pemilik_kelola_data/update_carousel') ?>" method="post" style="display:inline;">
+                  <?= csrf_field() ?>
                   <input type="hidden" name="id_produk" value="<?= $value['id_produk'] ?>">
                   <input type="checkbox" name="checked" value="1" <?= ($value['checked'] == 1 ? 'checked' : '') ?> onchange="this.form.submit()">
                 </form>

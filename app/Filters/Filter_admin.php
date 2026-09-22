@@ -19,7 +19,8 @@ class Filter_admin implements FilterInterface
 
     public function after(RequestInterface $request, ResponseInterface $response, $arguments = null)
     {
-        if (session()->get('level') != 2) {
+        $level = session()->get('level');
+        if (!empty($level) && (int) $level !== 2) {
             session()->setFlashdata('message', 'Anda Tidak Memiliki Akses Halaman Yang Dituju !!!');
             return redirect()->to(base_url('Home_admin'));
         }

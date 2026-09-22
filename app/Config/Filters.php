@@ -40,6 +40,8 @@ class Filters extends BaseConfig
 			'csrf' => [
 				'except' => [
 					'pelanggan_kelola_data/midtrans_notification', // Webhook Midtrans
+					'api_store',       // REST API (key-based, tanpa CSRF)
+					'api_store/*',     // REST API (key-based, tanpa CSRF)
 				],
 			],
 			'filter_toko' => [
@@ -50,6 +52,10 @@ class Filters extends BaseConfig
 					'home_toko/*',     // Sub-rute publik
 					'review',          // Review publik
 					'review/*',        // Review publik
+					'api_store',       // REST API publik
+					'api_store/*',     // REST API publik
+					'chat_admin_pembeli',   // API chat (guard sendiri, balas JSON)
+					'chat_admin_pembeli/*', // API chat (guard sendiri, balas JSON)
 					'pelanggan_kelola_data/review_get', // Ulasan publik (rating kartu & detail)
 					'pelanggan_kelola_data/review_get/*', // Ulasan publik (rating kartu & detail)
 					'pelanggan_kelola_data/midtrans_notification', // Webhook Midtrans (tanpa session)
@@ -65,6 +71,8 @@ class Filters extends BaseConfig
 				'home_pemilik/*',
 				'home_toko',
 				'home_toko/*',
+				'api_store',
+				'api_store/*',
 				'pelanggan_kelola_data',
 				'pelanggan_kelola_data/*',
 				'update_profile',
@@ -90,6 +98,8 @@ class Filters extends BaseConfig
 				'home_admin/*',
 				'home_toko',
 				'home_toko/*',
+				'api_store',
+				'api_store/*',
 				'pelanggan_kelola_data',
 				'pelanggan_kelola_data/*',
 				'update_profile',
@@ -115,6 +125,8 @@ class Filters extends BaseConfig
 				'home_admin/*',
 				'home_pemilik',
 				'home_pemilik/*',
+				'api_store',
+				'api_store/*',
 				'update_profile',
 				'update_profile/*',
 				'pelanggan_kelola_data',

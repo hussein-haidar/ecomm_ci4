@@ -106,84 +106,100 @@ class M_admin_stok extends Model
         $total_berat = 0;
         $stok_digunakan = [];
 
-        // Ambil data stok produk berdasarkan nama produk dan sesi_user
-        $stokList = $this->db->table('tbl_stok_produk')
-            ->where('nama_produk', $nama_produk)
-            ->where('sesi_user', $sesi_user)
-            ->where('jumlah_stok_produk >', 0)
-            ->orderBy('tanggal_masuk_produk', 'ASC')
-            ->get()
-            ->getResultArray();
+        $db = $this->db;
+        $db->transBegin();
 
-        if (empty($stokList)) {
-            return [
-                'success' => false,
-                'message' => 'Stok tidak tersedia untuk produk: ' . $nama_produk
-            ];
-        }
+        try {
+            // Ambil data stok produk dengan row lock (FOR UPDATE) agar tidak
+            // terjadi race condition saat dua transaksi mengurangi stok bersamaan.
+            // Catatan: membutuhkan engine InnoDB.
+            $sql = "SELECT * FROM tbl_stok_produk
+                    WHERE nama_produk = ? AND sesi_user = ? AND jumlah_stok_produk > 0
+                    ORDER BY tanggal_masuk_produk ASC
+                    FOR UPDATE";
+            $stokList = $db->query($sql, [$nama_produk, $sesi_user])->getResultArray();
 
-        $sisa = $jumlah_produk;
-
-        // Iterasi untuk mengurangi stok menggunakan metode FIFO
-        foreach ($stokList as $stok) {
-            if ($sisa <= 0) break;
-
-            $id_stok = $stok['id_stok'];
-            $jumlah_stok = $stok['jumlah_stok_produk'];
-            $harga = $stok['harga_produk'];
-            $berat = $stok['berat_produk'];
-
-            if ($jumlah_stok >= $sisa) {
-                // Kurangi sesuai sisa
-                $this->edit([
-                    'id_stok' => $id_stok,
-                    'jumlah_stok_produk' => $jumlah_stok - $sisa,
-                    'nama_produk' => $nama_produk, // Pastikan nama produk ada untuk perhitungan edit
-                ]);
-                $total_harga += $sisa * $harga;
-                $total_berat += $sisa * $berat;
-
-                $stok_digunakan[] = [
-                    'id_stok' => $id_stok,
-                    'jumlah_diambil' => $sisa,
-                    'harga' => $harga,
-                    'berat' => $berat
+            if (empty($stokList)) {
+                $db->transRollback();
+                return [
+                    'success' => false,
+                    'message' => 'Stok tidak tersedia untuk produk: ' . $nama_produk
                 ];
-                $sisa = 0;
-            } else {
-                // Kurangi seluruh stok ini
-                $this->edit([
-                    'id_stok' => $id_stok,
-                    'jumlah_stok_produk' => 0,
-                    'nama_produk' => $nama_produk, // Pastikan nama produk ada untuk perhitungan edit
-                ]);
-                $total_harga += $jumlah_stok * $harga;
-                $total_berat += $jumlah_stok * $berat;
-
-                $stok_digunakan[] = [
-                    'id_stok' => $id_stok,
-                    'jumlah_diambil' => $jumlah_stok,
-                    'harga' => $harga,
-                    'berat' => $berat
-                ];
-                $sisa -= $jumlah_stok;
             }
-        }
 
-        // Jika stok masih kurang, kembalikan error
-        if ($sisa > 0) {
+            $sisa = $jumlah_produk;
+
+            // Iterasi untuk mengurangi stok menggunakan metode FIFO
+            foreach ($stokList as $stok) {
+                if ($sisa <= 0) break;
+
+                $id_stok = $stok['id_stok'];
+                $jumlah_stok = $stok['jumlah_stok_produk'];
+                $harga = $stok['harga_produk'];
+                $berat = $stok['berat_produk'];
+
+                if ($jumlah_stok >= $sisa) {
+                    // Kurangi sesuai sisa
+                    $this->edit([
+                        'id_stok' => $id_stok,
+                        'jumlah_stok_produk' => $jumlah_stok - $sisa,
+                        'nama_produk' => $nama_produk, // Pastikan nama produk ada untuk perhitungan edit
+                    ]);
+                    $total_harga += $sisa * $harga;
+                    $total_berat += $sisa * $berat;
+
+                    $stok_digunakan[] = [
+                        'id_stok' => $id_stok,
+                        'jumlah_diambil' => $sisa,
+                        'harga' => $harga,
+                        'berat' => $berat
+                    ];
+                    $sisa = 0;
+                } else {
+                    // Kurangi seluruh stok ini
+                    $this->edit([
+                        'id_stok' => $id_stok,
+                        'jumlah_stok_produk' => 0,
+                        'nama_produk' => $nama_produk, // Pastikan nama produk ada untuk perhitungan edit
+                    ]);
+                    $total_harga += $jumlah_stok * $harga;
+                    $total_berat += $jumlah_stok * $berat;
+
+                    $stok_digunakan[] = [
+                        'id_stok' => $id_stok,
+                        'jumlah_diambil' => $jumlah_stok,
+                        'harga' => $harga,
+                        'berat' => $berat
+                    ];
+                    $sisa -= $jumlah_stok;
+                }
+            }
+
+            // Jika stok masih kurang, batalkan transaksi
+            if ($sisa > 0) {
+                $db->transRollback();
+                return [
+                    'success' => false,
+                    'message' => 'Stok tidak mencukupi untuk produk: ' . $nama_produk
+                ];
+            }
+
+            $db->transCommit();
+
+            return [
+                'success' => true,
+                'total_harga' => $total_harga,
+                'total_berat' => $total_berat,
+                'stok_digunakan' => $stok_digunakan
+            ];
+        } catch (\Exception $e) {
+            $db->transRollback();
+            log_message('error', 'FIFO stok gagal untuk ' . $nama_produk . ': ' . $e->getMessage());
             return [
                 'success' => false,
-                'message' => 'Stok tidak mencukupi untuk produk: ' . $nama_produk
+                'message' => 'Gagal mengurangi stok: ' . $e->getMessage()
             ];
         }
-
-        return [
-            'success' => true,
-            'total_harga' => $total_harga,
-            'total_berat' => $total_berat,
-            'stok_digunakan' => $stok_digunakan
-        ];
     }
 
     public function tambah_stok($id_stok, $jumlah)

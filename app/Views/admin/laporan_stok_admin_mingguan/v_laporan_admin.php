@@ -5,6 +5,7 @@
     <!-- /.box-header -->
     <div class="box-body">
         <form method="post" action="<?= base_url('admin_laporan_mingguan/filter_stok_by_date') ?>">
+            <?= csrf_field() ?>
             <div class="row">
                 <div class="col-md-3">
                     <div class="form-group">
@@ -31,6 +32,9 @@
             <?php if ($start_date && $end_date) : ?>
                 <a href="<?= base_url('admin_laporan_mingguan/cetak_laporan_stok') . '?start_date=' . $start_date . '&end_date=' . $end_date ?>" class="btn btn-sm btn-success" target="_blank">
                     <i class="fa fa-print" aria-hidden="true"></i> Cetak Data
+                </a>
+                <a href="<?= base_url('admin_laporan_mingguan/export_excel') . '?start_date=' . $start_date . '&end_date=' . $end_date ?>" class="btn btn-sm btn-info">
+                    <i class="fa fa-file-excel-o" aria-hidden="true"></i> Export Excel
                 </a>
                 <a href="<?= base_url('admin_laporan_mingguan/reset_filter_stok') ?>" class="btn btn-sm btn-secondary">
                     <i class="fa fa-refresh" aria-hidden="true"></i> Reset Filter

@@ -101,6 +101,7 @@
         </div>
 
         <form action="<?= base_url('auth/save_user') ?>" method="post" enctype="multipart/form-data">
+          <?= csrf_field() ?>
 
           <div class="row">
             <div class="col-md-6">
@@ -136,6 +137,15 @@
                   <option value="" disabled selected>Pilih Level</option>
                   <option value="1">Pemilik</option>
                 </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-12">
+              <div class="form-group">
+                <label>Email (opsional, untuk reset password)</label>
+                <input type="email" name="email_user" class="form-control" placeholder="Masukkan Email">
               </div>
             </div>
           </div>

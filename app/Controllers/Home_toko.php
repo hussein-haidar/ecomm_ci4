@@ -6,6 +6,7 @@ use CodeIgniter\Controller;
 
 use App\Models\M_home_toko;
 use App\Models\M_pemilik_produk;
+use App\Models\M_pemilik_banner;
 use App\Models\M_pelanggan_bayar;
 
 class Home_toko extends BaseController
@@ -52,7 +53,7 @@ class Home_toko extends BaseController
             'produk_data' => $produk_data,
             'title2' => 'Katalog Produk',
             'jenis_produk_dropdown' => $produkModel->getJenisProdukDropdown($sesi_user),
-            'data_produk' => $this->M_pemilik_produk->get_carousel($sesi_user),
+            'data_banner' => (new M_pemilik_banner())->get_banner_aktif($sesi_user),
             'user_logged_in' => $session->get('user_logged_in') === true,
         ];
 
@@ -72,13 +73,17 @@ class Home_toko extends BaseController
         $harga_min = $this->request->getVar('harga_min');
         $harga_max = $this->request->getVar('harga_max');
         $jenis_produk = $this->request->getVar('jenis_produk');
+        $rating_min = $this->request->getVar('rating_min');
 
         // Ambil sort berdasarkan jenis
         $sort_harga = $this->request->getVar('sort_harga');
         $sort_nama = $this->request->getVar('sort_nama');
+        $sort_by = $this->request->getVar('sort_by');
 
-        // Tentukan sort_by berdasarkan prioritas
-        $sort_by = $sort_harga ?: $sort_nama;
+        // Tentukan sort_by berdasarkan prioritas (sort_by takes precedence)
+        if (empty($sort_by)) {
+            $sort_by = $sort_harga ?: $sort_nama;
+        }
 
         $produkModel = new \App\Models\M_home_toko();
 
@@ -88,7 +93,8 @@ class Home_toko extends BaseController
             $harga_min,
             $harga_max,
             $sort_by,
-            $jenis_produk
+            $jenis_produk,
+            $rating_min
         );
 
         foreach ($produk_data as &$produk) {
@@ -122,7 +128,9 @@ class Home_toko extends BaseController
                 'harga_max' => $harga_max,
                 'sort_harga' => $sort_harga,
                 'sort_nama' => $sort_nama,
+                'sort_by' => $sort_by,
                 'jenis_produk' => $jenis_produk,
+                'rating_min' => $rating_min,
             ]
         ];
 

@@ -103,6 +103,7 @@ class Auth extends BaseController
                 'nama_lengkap' => $this->request->getPost('nama_lengkap'),
                 'nama_title' => $this->request->getPost('nama_title'),
                 'notelpon_user' => $this->request->getPost('notelpon_user'),
+                'email_user' => $this->request->getPost('email_user') ?: null,
                 'jobdesk_user' => $this->request->getPost('jobdesk_user'),
                 'level' => $this->request->getPost('level'),
                 'foto_user' => $nama_file,
@@ -194,6 +195,7 @@ class Auth extends BaseController
                 'nama_lengkap' => $namaLengkap,
                 'nama_title' => $this->request->getPost('nama_title') ?: 'Dashboard Pemilik',
                 'notelpon_user' => $this->request->getPost('notelpon_user'),
+                'email_user' => $this->request->getPost('email_user') ?: null,
                 'jobdesk_user' => $this->request->getPost('jobdesk_user') ?: 'Pemilik',
                 'level' => 1,
                 'foto_user' => $nama_file,
@@ -245,6 +247,116 @@ class Auth extends BaseController
         }
     }
 
+    public function lupa_password_user()
+    {
+        $data = [
+            'title' => 'Lupa Password',
+            'title2' => 'Lupa Password',
+        ];
+        return view('auth_login/v_lupa_password_user', $data);
+    }
+
+    public function kirim_token_reset_user()
+    {
+        $username = trim((string) $this->request->getPost('username'));
+
+        if (empty($username)) {
+            session()->setFlashdata('error_username', 'Username wajib diisi.');
+            return redirect()->to(base_url('auth/lupa_password_user'));
+        }
+
+        $user = $this->M_profil_user->findByUsername($username);
+
+        if (!$user) {
+            // Jangan bocorkan apakah username terdaftar (anti-enumeration)
+            session()->setFlashdata('pesan_success', 'Jika username terdaftar, link reset password telah dikirim.');
+            return redirect()->to(base_url('auth/lupa_password_user'));
+        }
+
+        $token   = bin2hex(random_bytes(32));
+        $expires = date('Y-m-d H:i:s', strtotime('+30 minutes'));
+
+        $this->M_profil_user->setResetToken($user['id_user'], $token, $expires);
+
+        $resetUrl = base_url('auth/form_reset_user/' . $token);
+
+        // Kirim link via email jika email_user tersedia dan email berhasil terkirim.
+        $email_user = $user['email_user'] ?? '';
+        if (!empty($email_user) && $this->kirimEmailReset($email_user, $user, $resetUrl)) {
+            session()->setFlashdata('pesan_success', 'Link reset password telah dikirim ke email ' . $email_user . ' (berlaku 30 menit).');
+        } else {
+            // Fallback dev: tampilkan link langsung di layar
+            session()->setFlashdata('pesan_success', 'Link reset password telah dibuat (berlaku 30 menit): ' . $resetUrl);
+        }
+
+        return redirect()->to(base_url('auth/lupa_password_user'));
+    }
+
+    private function kirimEmailReset($email_user, $user, $resetUrl)
+    {
+        $fromEmail = env('email.fromEmail', '') ?: 'noreply@' . (parse_url(base_url(), PHP_URL_HOST) ?: 'localhost');
+        $fromName  = env('email.fromName', '') ?: ($user['nama_lengkap'] ?? 'Aplikasi');
+
+        try {
+            $email = \Config\Services::email();
+            $email->setFrom($fromEmail, $fromName);
+            $email->setTo($email_user);
+            $email->setSubject('Reset Password Akun - ' . ($user['nama_lengkap'] ?? 'User'));
+            $email->setMessage('Klik link berikut untuk mereset password Anda (berlaku 30 menit): ' . $resetUrl);
+
+            return $email->send();
+        } catch (\Throwable $e) {
+            log_message('error', 'Kirim email reset gagal: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function form_reset_user($token = null)
+    {
+        $user = $this->M_profil_user->findByResetToken($token);
+
+        if (!$user) {
+            session()->setFlashdata('pesan_warning', 'Link reset tidak valid atau sudah kedaluwarsa.');
+            return redirect()->to(base_url('auth/lupa_password_user'));
+        }
+
+        $data = [
+            'title' => 'Reset Password',
+            'token' => $token,
+        ];
+        return view('auth_login/v_reset_password_user', $data);
+    }
+
+    public function proses_reset_user($token = null)
+    {
+        $user = $this->M_profil_user->findByResetToken($token);
+
+        if (!$user) {
+            session()->setFlashdata('pesan_warning', 'Link reset tidak valid atau sudah kedaluwarsa.');
+            return redirect()->to(base_url('auth/lupa_password_user'));
+        }
+
+        $new_password     = (string) $this->request->getPost('new_password');
+        $confirm_password = (string) $this->request->getPost('confirm_password');
+
+        if (strlen($new_password) < 4) {
+            session()->setFlashdata('error_password', 'Password minimal 4 karakter.');
+            return redirect()->to(base_url('auth/form_reset_user/' . $token));
+        }
+
+        if ($new_password !== $confirm_password) {
+            session()->setFlashdata('error_password', 'Password tidak cocok.');
+            return redirect()->to(base_url('auth/form_reset_user/' . $token));
+        }
+
+        // Simpan password plaintext (disesuaikan kebutuhan dev: mudah dibaca admin di DB)
+        $this->M_profil_user->updatePassword($user['id_user'], $new_password);
+        $this->M_profil_user->clearResetToken($user['id_user']);
+
+        session()->setFlashdata('pesan_success', 'Password berhasil diperbarui. Silakan login.');
+        return redirect()->to(base_url('auth/login_user'));
+    }
+
     public function login_user()
     {
         // Jika belum pilih toko, redirect ke pilih toko
@@ -283,7 +395,7 @@ class Auth extends BaseController
             // Cek apakah username ada
             $user = $this->M_profil_user->findByUsername($username);
             if ($user) {
-                // Jika username ada, cek password
+                // Jika username ada, cek password (plaintext: mudah dibaca admin di DB)
                 if ($user['password'] === $password) {
                     // Cek apakah sudah memilih toko
                     $tokoDipilih = session()->get('toko_sesi_user');
@@ -521,7 +633,7 @@ class Auth extends BaseController
             // Cek apakah username ada
             $user = $this->M_profil_pelanggan->findByEmail($email);
             if ($user) {
-                // Jika username ada, cek password
+                // Jika username ada, cek password (plaintext: mudah dibaca admin di DB)
                 if ($user['password'] === $password) {
                     // Login berhasil
 
@@ -632,7 +744,7 @@ session()->setFlashdata('pesan_welcome', 'Selamat Datang, ' . $user['nama_pelang
             return redirect()->back()->with('error_password', 'Password tidak cocok.');
         }
 
-        // Simpan password langsung tanpa hashing
+        // Simpan password plaintext (disesuaikan kebutuhan dev: mudah dibaca admin di DB)
         $this->M_profil_pelanggan->update($id_pelanggan, ['password' => $new_password]);
 
         return redirect()->to(base_url('auth/login_pelanggan'))->with('pesan_success', 'Password berhasil diperbarui.');

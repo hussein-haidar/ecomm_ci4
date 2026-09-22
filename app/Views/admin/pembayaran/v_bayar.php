@@ -62,6 +62,7 @@
               <td>
                 <!-- Form gabungan: dropdown dengan auto-submit dan input alasan jika dibatalkan -->
                 <form method="post" action="<?= base_url('admin_kelola_data/konfirm_status_bayar') ?>" class="d-inline">
+                  <?= csrf_field() ?>
                   <input type="hidden" name="id_bayar" value="<?= $value['id_bayar']; ?>">
                   <input type="hidden" name="sesi_user" value="<?= esc($sesi_user) ?>" readonly>
                   <!-- Dropdown untuk memilih status -->

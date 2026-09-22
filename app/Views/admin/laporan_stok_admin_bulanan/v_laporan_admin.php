@@ -3,6 +3,7 @@
     </div>
     <div class="box-body">
         <form action="<?= base_url('admin_laporan_bulanan/filter_stok_by_month') ?>" method="post">
+            <?= csrf_field() ?>
             <div class="row">
                 <div class="col-md-3">
                     <div class="form-group">
@@ -29,6 +30,9 @@
             <?php if ($start_month && $end_month) : ?>
                 <a href="<?= base_url('admin_laporan_bulanan/cetak_laporan_stok?start_month=' . $start_month . '&end_month=' . $end_month) ?>" class="btn btn-sm btn-success mt-3" target="_blank">
                     <i class="fa fa-print" aria-hidden="true"></i> Cetak Data
+                </a>
+                <a href="<?= base_url('admin_laporan_bulanan/export_excel?start_month=' . $start_month . '&end_month=' . $end_month) ?>" class="btn btn-sm btn-info mt-3">
+                    <i class="fa fa-file-excel-o" aria-hidden="true"></i> Export Excel
                 </a>
                 <a href="<?= base_url('admin_laporan_bulanan/reset_filter_stok') ?>" class="btn btn-sm btn-secondary mt-3">
                     <i class="fa fa-refresh" aria-hidden="true"></i> Reset Filter

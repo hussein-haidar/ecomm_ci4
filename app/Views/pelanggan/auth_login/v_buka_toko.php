@@ -131,6 +131,12 @@
             <input type="text" name="notelpon_user" class="form-control" placeholder="08xxxxxxxxxx">
           </div>
         </div>
+        <div class="col-md-6">
+          <div class="form-group">
+            <label>Email (opsional, untuk reset password)</label>
+            <input type="email" name="email_user" class="form-control" placeholder="masukkan email">
+          </div>
+        </div>
       </div>
 
       <div class="row">

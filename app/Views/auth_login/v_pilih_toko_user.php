@@ -80,6 +80,7 @@
     <?php else: ?>
       <?php foreach ($toko_list as $toko): ?>
         <form method="POST" action="<?= base_url('auth/set_toko_user') ?>">
+          <?= csrf_field() ?>
           <input type="hidden" name="sesi_user_toko" value="<?= esc($toko['sesi_user']) ?>">
           <div class="toko-card" onclick="this.closest('form').submit();">
             <img src="<?= base_url($toko['logo']) ?>" alt="<?= esc($toko['nama_toko']) ?>">

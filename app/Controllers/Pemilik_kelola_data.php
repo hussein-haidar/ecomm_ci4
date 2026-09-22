@@ -8,6 +8,7 @@ use App\Models\M_pemilik_jenis_produk;
 use App\Models\M_pemilik_satuan_produk;
 use App\Models\M_pemilik_produk;
 use App\Models\M_pemilik_bank;
+use App\Models\M_pemilik_banner;
 
 
 class Pemilik_kelola_data extends BaseController
@@ -17,6 +18,7 @@ class Pemilik_kelola_data extends BaseController
     protected $M_pemilik_satuan_produk;
     protected $M_pemilik_produk;
     protected $M_pemilik_bank;
+    protected $M_pemilik_banner;
     protected $db;
 
     public function __construct()
@@ -26,6 +28,7 @@ class Pemilik_kelola_data extends BaseController
         $this->M_pemilik_satuan_produk = new M_pemilik_satuan_produk();
         $this->M_pemilik_produk = new M_pemilik_produk();
         $this->M_pemilik_bank = new M_pemilik_bank();
+        $this->M_pemilik_banner = new M_pemilik_banner();
         $this->db = \Config\Database::connect();
     }
 
@@ -1127,5 +1130,216 @@ class Pemilik_kelola_data extends BaseController
         $this->M_pemilik_bank->delete_hard($data);
         session()->setFlashdata('pesan', 'Data Bank Ini Berhasil Di Hapus !');
         return redirect()->to(base_url('pemilik_kelola_data/data_dihapus_bank'));
+    }
+
+    // ==================== Banner Promo ====================
+
+    public function banner()
+    {
+        $data = [
+            'title' => 'Daftar Banner Promo',
+            'title2' => 'Data Banner Promo',
+            'banner' => $this->M_pemilik_banner->get_banner(),
+            'isi' => 'pemilik/banner/v_banner',
+        ];
+        return view('layout/v_template', $data);
+    }
+
+    public function add_banner()
+    {
+        // Ambil nama_pelanggan dari session
+        $sesi_user = session()->get('sesi_user');
+
+        // Cek jika nama_pelanggan tidak ditemukan dalam session
+        if (empty($sesi_user)) {
+            return redirect()->to('auth/login_user');
+        }
+        // Ambil data pelanggan
+        $data_user = $this->M_pemilik_banner->get_user_by_id($sesi_user);
+
+        $data = [
+            'title' => 'Tambah Banner Promo',
+            'title2' => 'Data Banner Promo',
+            'sesi_user' => $data_user ? $data_user['sesi_user'] : 'Nama Lengkap Tidak Ditemukan',
+            'isi' => 'pemilik/banner/v_add',
+        ];
+        return view('layout/v_template', $data);
+    }
+
+    public function save_banner()
+    {
+        if ($this->validate([
+            'judul_banner' => [
+                'label' => 'Judul Banner',
+                'rules' => 'required',
+                'errors' => [
+                    'required' => '{field} Wajib Diisi !!!'
+                ]
+            ],
+            'foto_banner' => [
+                'label' => 'Foto Banner',
+                'rules' => 'uploaded[foto_banner]|max_size[foto_banner,1792]|mime_in[foto_banner,image/png,image/jpg,image/jpeg,image/gif]',
+                'errors' => [
+                    'uploaded' => '{field} Wajib Diisi !!!',
+                    'max_size' => '{field} Max 1792 KB !!!',
+                    'mime_in'  => 'Format {field} Wajib PNG, JPG, JPEG, GIF !!!'
+                ]
+            ],
+        ])) {
+            // mengambil file + random name
+            $foto = $this->request->getFile('foto_banner');
+            $nama_file = $foto->getRandomName();
+
+            $status = $this->request->getPost('status') ? 1 : 0;
+
+            $data = [
+                'sesi_user'        => $this->request->getPost('sesi_user'),
+                'judul_banner'     => $this->request->getPost('judul_banner'),
+                'deskripsi_banner' => $this->request->getPost('deskripsi_banner') ?? '',
+                'link_banner'      => $this->request->getPost('link_banner') ?? '',
+                'status'           => $status,
+                'foto_banner'      => $nama_file,
+            ];
+            $foto->move('fotobanner', $nama_file);
+            $this->M_pemilik_banner->add($data);
+
+            session()->setFlashdata('pesan', 'Data Banner Promo Berhasil Ditambahkan !');
+            return redirect()->to(base_url('pemilik_kelola_data/banner'));
+        } else {
+            session()->setFlashdata('errors', \Config\Services::validation()->getErrors());
+            return redirect()->to(base_url('pemilik_kelola_data/add_banner'));
+        }
+    }
+
+    public function edit_banner($id_banner)
+    {
+        // Ambil nama_pelanggan dari session
+        $sesi_user = session()->get('sesi_user');
+
+        // Cek jika nama_pelanggan tidak ditemukan dalam session
+        if (empty($sesi_user)) {
+            return redirect()->to('auth/login_user');
+        }
+        // Ambil data pelanggan
+        $data_user = $this->M_pemilik_banner->get_user_by_id($sesi_user);
+
+        $data = [
+            'title' => 'Edit Banner Promo',
+            'title2' => 'Data Banner Promo',
+            'banner' => $this->M_pemilik_banner->detailBanner($id_banner),
+            'sesi_user' => $data_user ? $data_user['sesi_user'] : 'Nama Lengkap Tidak Ditemukan',
+            'isi' => 'pemilik/banner/v_edit',
+        ];
+        return view('layout/v_template', $data);
+    }
+
+    public function update_banner($id_banner)
+    {
+        if ($this->validate([
+            'judul_banner' => [
+                'label' => 'Judul Banner',
+                'rules' => 'required',
+                'errors' => [
+                    'required' => '{field} Wajib Diisi !!!'
+                ]
+            ],
+            'foto_banner' => [
+                'label' => 'Foto Banner',
+                'rules' => 'max_size[foto_banner,1792]|mime_in[foto_banner,image/png,image/jpg,image/jpeg,image/gif]',
+                'errors' => [
+                    'max_size' => '{field} Max 1792 KB !!!',
+                    'mime_in'  => 'Format {field} Wajib PNG, JPG, JPEG, GIF !!!'
+                ]
+            ],
+        ])) {
+            $foto = $this->request->getFile('foto_banner');
+
+            // Simpan nama file foto lama jika tidak upload foto baru
+            $nama_file = $this->request->getPost('foto_lama');
+
+            if ($foto && $foto->getError() !== 4) {
+                $nama_file = $foto->getRandomName();
+                $foto->move('fotobanner', $nama_file);
+                // Hapus foto lama (jika ada)
+                if ($this->request->getPost('foto_lama')) {
+                    $file_lama = 'fotobanner/' . $this->request->getPost('foto_lama');
+                    if (file_exists($file_lama)) {
+                        unlink($file_lama);
+                    }
+                }
+            }
+
+            $status = $this->request->getPost('status') ? 1 : 0;
+
+            $data = [
+                'id_banner'        => $id_banner,
+                'sesi_user'        => $this->request->getPost('sesi_user'),
+                'judul_banner'     => $this->request->getPost('judul_banner'),
+                'deskripsi_banner' => $this->request->getPost('deskripsi_banner') ?? '',
+                'link_banner'      => $this->request->getPost('link_banner') ?? '',
+                'status'           => $status,
+                'foto_banner'      => $nama_file,
+            ];
+            $this->M_pemilik_banner->edit($data);
+
+            session()->setFlashdata('pesan', 'Data Banner Promo Ini Berhasil Di Ganti !');
+            return redirect()->to(base_url('pemilik_kelola_data/banner'));
+        } else {
+            session()->setFlashdata('errors', \Config\Services::validation()->getErrors());
+            return redirect()->to(base_url('pemilik_kelola_data/edit_banner/' . $id_banner));
+        }
+    }
+
+    public function status_banner($id_banner)
+    {
+        // Toggle status aktif / nonaktif banner
+        $banner = $this->M_pemilik_banner->detailBanner($id_banner);
+        if ($banner) {
+            $status_baru = ($banner['status'] == 1) ? 0 : 1;
+            $this->M_pemilik_banner->update($id_banner, ['status' => $status_baru]);
+        }
+        return redirect()->to(base_url('pemilik_kelola_data/banner'));
+    }
+
+    public function delete_banner($id_banner)
+    {
+        // Soft delete banner, menandai banner sebagai terhapus
+        $this->M_pemilik_banner->update($id_banner, ['deleted_at' => 1]);
+        return redirect()->to(base_url('pemilik_kelola_data/banner'))->with('pesan', 'Data Banner Promo berhasil dihapus !');
+    }
+
+    public function data_dihapus_banner()
+    {
+        $data = [
+            'title' => 'Data Banner Promo Dihapus',
+            'title2' => 'Data Banner Promo Dihapus',
+            'data_banner_dihapus' => $this->M_pemilik_banner->get_banner_dihapus(),
+            'isi' => 'pemilik/banner/v_data_dihapus',
+        ];
+        return view('layout/v_template', $data);
+    }
+
+    public function restore_banner($id_banner)
+    {
+        // Restore banner yang telah dihapus
+        $this->M_pemilik_banner->update($id_banner, ['deleted_at' => 0]);
+        return redirect()->to(base_url('pemilik_kelola_data/banner'))->with('pesan', 'Data Banner Promo Berhasil Di Restore !');
+    }
+
+    public function delete_hard_banner($id_banner)
+    {
+        $banner = $this->M_pemilik_banner->detailBanner($id_banner);
+        if ($banner && !empty($banner['foto_banner'])) {
+            $file_lama = 'fotobanner/' . $banner['foto_banner'];
+            if (file_exists($file_lama)) {
+                unlink($file_lama);
+            }
+        }
+        $data = [
+            'id_banner' => $id_banner,
+        ];
+        $this->M_pemilik_banner->delete_hard($data);
+        session()->setFlashdata('pesan', 'Data Banner Promo Ini Berhasil Di Hapus !');
+        return redirect()->to(base_url('pemilik_kelola_data/data_dihapus_banner'));
     }
 }

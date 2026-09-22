@@ -145,31 +145,7 @@
     };
 </script>
 
-<script>
-    let currentIndex = 0;
-    const images = document.querySelectorAll('#carousel img');
 
-    function showImage(index) {
-        images.forEach(img => img.classList.remove('active'));
-        images[index].classList.add('active');
-    }
-
-    function nextImage() {
-        currentIndex = (currentIndex + 1) % images.length;
-        showImage(currentIndex);
-    }
-
-    function prevImage() {
-        currentIndex = (currentIndex - 1 + images.length) % images.length;
-        showImage(currentIndex);
-    }
-
-    // Auto-slide setiap 3 detik
-    setInterval(nextImage, 3000);
-
-    // Tampilkan gambar pertama pas awal load
-    showImage(currentIndex);
-</script>
 
 <script>
     <?php if (session()->getFlashdata('pesan_welcome')): ?>
@@ -326,6 +302,158 @@
             });
         <?php endif; ?>
     <?php endif; ?>
+</script>
+
+<script>
+// ============================================================
+// NAVBAR SCRIPTS (Drawer, Search, Dropdowns, Rating Filter)
+// Harus jalan SETELAH v_chat_popup & logoutPelanggan didefinisikan
+// ============================================================
+
+// ====== Drawer Menu ======
+const navDrawer = document.getElementById('mainNav');
+const navBackdrop = document.getElementById('navBackdrop');
+const btnMenuToggle = document.getElementById('btnMenuToggle');
+const btnCloseDrawer = document.getElementById('btnCloseDrawer');
+
+function openDrawer() {
+    navDrawer.classList.add('active');
+    navBackdrop.classList.add('active');
+    btnMenuToggle.setAttribute('aria-expanded', 'true');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeDrawer() {
+    navDrawer.classList.remove('active');
+    navBackdrop.classList.remove('active');
+    btnMenuToggle.setAttribute('aria-expanded', 'false');
+    document.body.style.overflow = '';
+}
+
+function toggleDrawer() {
+    if (navDrawer.classList.contains('active')) closeDrawer(); else openDrawer();
+}
+
+btnMenuToggle?.addEventListener('click', toggleDrawer);
+btnCloseDrawer?.addEventListener('click', closeDrawer);
+navBackdrop?.addEventListener('click', closeDrawer);
+
+// Close drawer on link click (mobile)
+document.addEventListener('click', function(e) {
+    if (window.innerWidth <= 768) {
+        const link = e.target.closest('#mainNav a');
+        if (link && !link.closest('.drawer-toggle')) closeDrawer();
+    }
+});
+
+// Close drawer on resize to desktop
+window.addEventListener('resize', function() {
+    if (window.innerWidth > 768) closeDrawer();
+});
+
+// ====== Drawer Submenu (Jenis Produk) ======
+document.addEventListener('click', function(e) {
+    const toggle = e.target.closest('.drawer-toggle');
+    if (toggle) {
+        e.preventDefault();
+        const parent = toggle.closest('.drawer-dropdown');
+        if (parent) {
+            const isOpen = parent.classList.toggle('active');
+            toggle.setAttribute('aria-expanded', isOpen);
+        }
+    }
+    // Close other dropdowns when clicking outside
+    if (!e.target.closest('.drawer-dropdown')) {
+        document.querySelectorAll('.drawer-dropdown.active').forEach(d => {
+            d.classList.remove('active');
+            d.querySelector('.drawer-toggle')?.setAttribute('aria-expanded', 'false');
+        });
+    }
+});
+
+// ====== Mobile Search Overlay ======
+const btnSearchToggle = document.getElementById('btnSearchToggle');
+const searchOverlay = document.getElementById('searchOverlay');
+const mobileSearchInput = document.getElementById('mobileSearchKeyword');
+
+function openSearch() {
+    searchOverlay.classList.add('active');
+    btnSearchToggle.setAttribute('aria-expanded', 'true');
+    document.body.style.overflow = 'hidden';
+    setTimeout(() => mobileSearchInput?.focus(), 100);
+}
+
+function closeSearch() {
+    searchOverlay.classList.remove('active');
+    btnSearchToggle.setAttribute('aria-expanded', 'false');
+    document.body.style.overflow = '';
+}
+
+function toggleSearch() {
+    if (searchOverlay.classList.contains('active')) closeSearch(); else openSearch();
+}
+
+btnSearchToggle?.addEventListener('click', toggleSearch);
+searchOverlay?.addEventListener('click', function(e) {
+    if (e.target === searchOverlay) closeSearch();
+});
+
+// Close search on Escape
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeSearch();
+        closeDrawer();
+    }
+});
+
+// ====== User Dropdown (Desktop) ======
+const userMenuBtn = document.getElementById('userMenuBtn');
+const userDropdown = document.getElementById('userDropdown');
+
+userMenuBtn?.addEventListener('click', function(e) {
+    e.stopPropagation();
+    const isOpen = userDropdown.classList.toggle('active');
+    userMenuBtn.setAttribute('aria-expanded', isOpen);
+});
+
+document.addEventListener('click', function(e) {
+    if (!e.target.closest('.user-menu')) {
+        userDropdown?.classList.remove('active');
+        userMenuBtn?.setAttribute('aria-expanded', 'false');
+    }
+});
+
+// ====== Desktop Nav Dropdown (Jenis Produk) ======
+document.addEventListener('click', function(e) {
+    const toggle = e.target.closest('.header-nav-toggle');
+    if (toggle) {
+        e.preventDefault();
+        const parent = toggle.closest('.header-nav-dropdown');
+        if (parent) {
+            const isOpen = parent.classList.toggle('active');
+            toggle.setAttribute('aria-expanded', isOpen);
+        }
+        return;
+    }
+    if (!e.target.closest('.header-nav-dropdown')) {
+        document.querySelectorAll('.header-nav-dropdown.active').forEach(function(d) {
+            d.classList.remove('active');
+            d.querySelector('.header-nav-toggle')?.setAttribute('aria-expanded', 'false');
+        });
+    }
+});
+
+// ====== Rating Filter (Modal) ======
+function setRatingFilter(btn, rating) {
+    document.querySelectorAll('.star-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('rating_min').value = rating;
+}
+
+function clearRatingFilter() {
+    document.querySelectorAll('.star-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('rating_min').value = '';
+}
 </script>
 
 <script>

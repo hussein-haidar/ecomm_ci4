@@ -87,6 +87,7 @@
     <div class="modal-dialog">
       <div class="modal-content">
         <form method="POST" id="formReview">
+          <?= csrf_field() ?>
           <div class="modal-header">
             <h5 class="modal-title" id="modalReviewTitle">Beri Review</h5>
             <button type="button" class="close" data-bs-dismiss="modal">&times;</button>

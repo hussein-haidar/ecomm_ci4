@@ -94,6 +94,7 @@
                 <div class="form-group">
                     <label>Menu Setting User</label>
                     <form method="post" action="<?= base_url('home_admin/update_tampilan_motif_kriteria') ?>">
+                        <?= csrf_field() ?>
                         <label>
                             <input type="checkbox" name="tampilkan_motif" value="1" <?= $tampilkan_motif ? 'checked' : '' ?>>
                             Tampilkan Menu Motif Produk

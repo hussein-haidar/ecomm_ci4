@@ -223,77 +223,105 @@ class M_pelanggan_bayar extends Model
             ->where('nama_pelanggan', $nama_pelanggan)
             ->findAll();
 
-        // Inisialisasi model yang dibutuhkan
-        $pembelianModel  = new \App\Models\M_pelanggan_beli();
-        $stokModel       = new \App\Models\M_admin_stok();
-        $keranjangModel  = new \App\Models\M_pelanggan_keranjang();
-        $pembelianData   = new \App\Models\M_pelanggan_beli();
-        $ekspedisiModel  = new \App\Models\M_pelanggan_ekspedisi();
-
         foreach ($expired as $data) {
-            $nama_pelanggan = $data['nama_pelanggan'];
-            $nama_produk    = $data['nama_produk'];
+            $this->prosesPembatalanExpired($data);
+        }
+    }
 
-            // Ambil semua data pembelian untuk pelanggan dan produk tersebut
-            $pembelian_list = $pembelianModel->where([
-                'nama_pelanggan' => $nama_pelanggan,
-                'nama_produk'    => $nama_produk
-            ])->findAll();
+    /**
+     * Membatalkan SEMUA transaksi yang melewati batas waktu bayar (dipakai cron job).
+     * Tidak bergantung pada pelanggan yang sedang login.
+     */
+    public function batalkanSemuaTransaksiExpired()
+    {
+        $now = date('Y-m-d H:i:s');
 
-            // Kembalikan stok berdasarkan id_stok yang digunakan saat pembelian
-            foreach ($pembelian_list as $pembelian) {
-                $id_stok = $pembelian['id_stok'];
-                $jumlah  = $pembelian['jumlah_produk'];
+        $expired = $this->where('status_bayar', 'Belum Bayar')
+            ->where('batas_waktu_bayar <', $now)
+            ->findAll();
 
-                // Tambah stok ke id_stok yang sama
-                $stokModel->tambah_stok($id_stok, $jumlah);
-            }
+        $total = 0;
+        foreach ($expired as $data) {
+            $this->prosesPembatalanExpired($data);
+            $total++;
+        }
 
-            // Hapus data keranjang terkait (scoped per data pembayaran)
-            $keranjangModel->where([
+        return $total;
+    }
+
+    /**
+     * Logika pembatalan satu transaksi kadaluarsa: kembalikan stok,
+     * hapus pembelian/keranjang/ekspedisi/pembayaran terkait.
+     */
+    protected function prosesPembatalanExpired($data)
+    {
+        $nama_pelanggan = $data['nama_pelanggan'];
+        $nama_produk    = $data['nama_produk'];
+
+        $pembelianModel = new \App\Models\M_pelanggan_beli();
+        $stokModel      = new \App\Models\M_admin_stok();
+        $keranjangModel = new \App\Models\M_pelanggan_keranjang();
+        $ekspedisiModel = new \App\Models\M_pelanggan_ekspedisi();
+
+        // Ambil semua data pembelian untuk pelanggan dan produk tersebut
+        $pembelian_list = $pembelianModel->where([
+            'nama_pelanggan' => $nama_pelanggan,
+            'nama_produk'    => $nama_produk
+        ])->findAll();
+
+        // Kembalikan stok berdasarkan id_stok yang digunakan saat pembelian
+        foreach ($pembelian_list as $pembelian) {
+            $id_stok = $pembelian['id_stok'];
+            $jumlah  = $pembelian['jumlah_produk'];
+
+            // Tambah stok ke id_stok yang sama
+            $stokModel->tambah_stok($id_stok, $jumlah);
+        }
+
+        // Hapus data keranjang terkait (scoped per data pembayaran)
+        $keranjangModel->where([
+            'nama_pelanggan' => $nama_pelanggan,
+            'nama_produk'    => $nama_produk,
+            'status_keranjang' => 'Selesai'
+        ])->delete();
+
+        // Hapus data pembelian (scoped by id_beli jika ada, selain itu oleh pembayaran ini)
+        if (!empty($data['id_beli'])) {
+            $pembelianModel->where([
+                'id_beli' => $data['id_beli'],
+                'status_bayar' => 'Belum Bayar',
+                'sesi_user' => $data['sesi_user'] ?? ''
+            ])->delete();
+        } else {
+            $pembelianModel->where([
                 'nama_pelanggan' => $nama_pelanggan,
                 'nama_produk'    => $nama_produk,
-                'status_keranjang' => 'Selesai'
+                'status_bayar' => 'Belum Bayar',
+                'sesi_user' => $data['sesi_user'] ?? ''
             ])->delete();
+        }
 
-            // Hapus data pembelian (scoped by id_beli jika ada, selain itu oleh pembayaran ini)
-            if (!empty($data['id_beli'])) {
-                $pembelianData->where([
-                    'id_beli' => $data['id_beli'],
-                    'status_bayar' => 'Belum Bayar',
-                    'sesi_user' => $data['sesi_user'] ?? ''
-                ])->delete();
-            } else {
-                $pembelianData->where([
-                    'nama_pelanggan' => $nama_pelanggan,
-                    'nama_produk'    => $nama_produk,
-                    'status_bayar' => 'Belum Bayar',
-                    'sesi_user' => $data['sesi_user'] ?? ''
-                ])->delete();
-            }
-
-            // Hapus data ekspedisi (scoped by id_ekspedisi dari pembayaran)
-            if (!empty($data['id_ekspedisi'])) {
-                $ekspedisiModel->where([
-                    'id_ekspedisi' => $data['id_ekspedisi']
-                ])->delete();
-            }
-
-            // Hapus data pembayaran (dari model ini sendiri)
-            $this->where([
-                'id_bayar' => $data['id_bayar']
+        // Hapus data ekspedisi (scoped by id_ekspedisi dari pembayaran)
+        if (!empty($data['id_ekspedisi'])) {
+            $ekspedisiModel->where([
+                'id_ekspedisi' => $data['id_ekspedisi']
             ])->delete();
+        }
 
-            // Hapus file QR Code jika ada
-            $qrFile = FCPATH . 'qr/qr_' . $data['id_bayar'] . '.png';
-            if (file_exists($qrFile)) {
-                unlink($qrFile);
-            }
-            // Hapus file snap_url jika ada
-            $urlFile = FCPATH . 'qr/qr_' . $data['id_bayar'] . '_url.txt';
-            if (file_exists($urlFile)) {
-                unlink($urlFile);
-            }
+        // Hapus data pembayaran (dari model ini sendiri)
+        $this->where([
+            'id_bayar' => $data['id_bayar']
+        ])->delete();
+
+        // Hapus file QR Code jika ada
+        $qrFile = FCPATH . 'qr/qr_' . $data['id_bayar'] . '.png';
+        if (file_exists($qrFile)) {
+            unlink($qrFile);
+        }
+        // Hapus file snap_url jika ada
+        $urlFile = FCPATH . 'qr/qr_' . $data['id_bayar'] . '_url.txt';
+        if (file_exists($urlFile)) {
+            unlink($urlFile);
         }
     }
 }

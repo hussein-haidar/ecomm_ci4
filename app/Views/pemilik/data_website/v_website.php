@@ -61,6 +61,7 @@
                 </label>
                 <!-- Tombol status dengan warna berdasarkan nilai terbaru -->
                 <form method="post" action="<?= base_url('pemilik_kelola_website/update_checked') ?>" class="d-inline">
+                  <?= csrf_field() ?>
                   <input type="hidden" name="id_website" value="<?= $value['id_website']; ?>">
                   <input type="hidden" name="is_checked" value="<?= $value['is_checked'] == 1 ? '2' : '1'; ?>">
 

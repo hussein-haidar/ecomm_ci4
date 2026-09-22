@@ -61,6 +61,7 @@
                 <!-- Menu Setting User -->
                 <span class="me-2 fw-bold">Menu Setting User</span>
                 <form method="post" action="<?= base_url('pemilik_kelola_user/update_tampilan_varian') ?>">
+                  <?= csrf_field() ?>
                   <!-- Kirim ID user target -->
                   <input type="hidden" name="id_user" value="<?= $value['id_user'] ?>">
 

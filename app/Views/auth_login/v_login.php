@@ -133,6 +133,14 @@
           
         </div>
 
+        <div class="row" style="margin-top: 5px;">
+          <div class="col-xs-12">
+            <a href="<?= base_url('auth/lupa_password_user') ?>" class="btn btn-link">
+              <i class="fa fa-key"></i> Lupa Password?
+            </a>
+          </div>
+        </div>
+
       </div>
       <!-- /.login-box-body -->
     </div>

@@ -24,6 +24,7 @@
 
         <!-- Form untuk trigger proses backup -->
         <form action="<?= base_url('pemilik_kelola_website/proses_db') ?>" method="post">
+            <?= csrf_field() ?>
             <div class="form-group">
                 <label>Silahkan klik tombol backup untuk ambil database toko</label>
             </div>

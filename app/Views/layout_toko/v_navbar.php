@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="<?= base_url() ?>/template_admin/dist/css/AdminLTE.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="<?= base_url('themes/' . ($tokoData['tema_website'] ?? 'default') . '/css/toko.css?v=20260919') ?>">
+    <link rel="stylesheet" href="<?= base_url('themes/' . ($tokoData['tema_website'] ?? 'default') . '/css/toko.css?v=20260919c') ?>">
     <link href="<?= base_url() ?>/icon/gudang.ico" rel="shortcut icon">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
     <?= view('layout_toko/v_csrf_script') ?>
@@ -87,8 +87,8 @@ if (!empty($nama_pelanggan)) {
             </a>
         </div>
 
-        <!-- Search Bar (Desktop: visible, Mobile: toggle) -->
-        <div class="header-search" id="headerSearch">
+        <!-- Search Bar (Desktop only) -->
+        <div class="header-search d-none d-lg-block" id="headerSearch">
             <form method="GET" action="<?= base_url('home_toko/katalog') ?>" class="search-form">
                 <label for="searchKeyword" class="sr-only">Cari produk</label>
                 <input type="text" id="searchKeyword" name="keyword" class="search-input" placeholder="Cari produk..." value="<?= esc($_GET['keyword'] ?? '') ?>">
@@ -278,11 +278,6 @@ if (!empty($nama_pelanggan)) {
                             <i class="fas fa-filter"></i> <span>Filter Produk</span>
                         </a>
                     </li>
-                    <li>
-                        <a href="<?= base_url('home_toko/katalog') ?>" class="drawer-link">
-                            <i class="fas fa-search"></i> <span>Cari Produk</span>
-                        </a>
-                    </li>
                 </ul>
             </div>
 
@@ -291,11 +286,6 @@ if (!empty($nama_pelanggan)) {
                 <div class="drawer-section">
                     <h3 class="drawer-section-title">Masuk / Daftar</h3>
                     <ul class="drawer-menu">
-                        <li>
-                            <a href="<?= base_url('auth/pilih_toko') ?>" class="drawer-link">
-                                <i class="fas fa-store"></i> <span>Pilih Toko</span>
-                            </a>
-                        </li>
                         <li>
                             <a href="<?= base_url('home_toko/login') ?>" class="drawer-link primary">
                                 <i class="fas fa-sign-in-alt"></i> <span>Login</span>
@@ -461,23 +451,15 @@ if (!empty($nama_pelanggan)) {
                         </div>
                     </div>
 
-                    <!-- Urutkan Berdasarkan Harga -->
+                    <!-- Urutkan -->
                     <div class="filter-group">
-                        <label for="sort_harga" class="filter-label">Urutkan Berdasarkan Harga</label>
-                        <select name="sort_harga" id="sort_harga" class="filter-control">
+                        <label for="sort_by" class="filter-label">Urutkan</label>
+                        <select name="sort_by" id="sort_by" class="filter-control">
                             <option value="">Default</option>
-                            <option value="asc" <?= ($filter_params['sort_harga'] ?? '') == 'asc' ? 'selected' : '' ?>>Harga Terendah</option>
-                            <option value="desc" <?= ($filter_params['sort_harga'] ?? '') == 'desc' ? 'selected' : '' ?>>Harga Tertinggi</option>
-                        </select>
-                    </div>
-
-                    <!-- Sorting Nama -->
-                    <div class="filter-group">
-                        <label for="sort_nama" class="filter-label">Sorting Nama</label>
-                        <select name="sort_nama" id="sort_nama" class="filter-control">
-                            <option value="">Pilih Urutan</option>
-                            <option value="a-z" <?= ($filter_params['sort_nama'] ?? '') == 'a-z' ? 'selected' : '' ?>>A - Z</option>
-                            <option value="z-a" <?= ($filter_params['sort_nama'] ?? '') == 'z-a' ? 'selected' : '' ?>>Z - A</option>
+                            <option value="asc" <?= ($filter_params['sort_by'] ?? '') == 'asc' ? 'selected' : '' ?>>Harga Terendah</option>
+                            <option value="desc" <?= ($filter_params['sort_by'] ?? '') == 'desc' ? 'selected' : '' ?>>Harga Tertinggi</option>
+                            <option value="a-z" <?= ($filter_params['sort_by'] ?? '') == 'a-z' ? 'selected' : '' ?>>Nama A-Z</option>
+                            <option value="z-a" <?= ($filter_params['sort_by'] ?? '') == 'z-a' ? 'selected' : '' ?>>Nama Z-A</option>
                         </select>
                     </div>
 
@@ -510,7 +492,17 @@ if (!empty($nama_pelanggan)) {
     </div>
 </div>
 
-<!-- Include chat popup if exists -->
-<?php if (file_exists(APPPATH . 'Views/layout_toko/v_chat_popup.php')): ?>
-    <?= view('layout_toko/v_chat_popup') ?>
-<?php endif; ?>
+
+
+<script>
+// Ensure search buttons submit form on click
+document.addEventListener('DOMContentLoaded', function() {
+    // Desktop search button
+    document.querySelectorAll('.search-form .btn-search, .search-form-full .btn-search-full').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            this.closest('form').submit();
+        });
+    });
+});
+</script>

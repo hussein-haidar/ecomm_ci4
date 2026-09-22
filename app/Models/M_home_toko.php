@@ -24,7 +24,7 @@ class M_home_toko extends Model
         'total_berat'
     ];
 
-    public function getProduk($sesi_user, $keyword = '', $harga_min = null, $harga_max = null, $sort_by = '', $jenis_produk = '')
+    public function getProduk($sesi_user, $keyword = '', $harga_min = null, $harga_max = null, $sort_by = '', $jenis_produk = '', $rating_min = null)
     {
         // Ambil semua produk sesuai filter
         $builder = $this->db->table('tbl_stok_produk')
@@ -50,6 +50,17 @@ class M_home_toko extends Model
         if (!empty($harga_max)) {
             $builder->where('tbl_stok_produk.harga_produk <=', $harga_max);
         }
+
+        // Filter by rating_min using subquery
+        if (!empty($rating_min) && $rating_min >= 1 && $rating_min <= 5) {
+            $builder->where("tbl_stok_produk.nama_produk IN (
+                SELECT nama_produk FROM tbl_review
+                WHERE sesi_user = '$sesi_user'
+                GROUP BY nama_produk
+                HAVING AVG(rating) >= $rating_min
+            )", null, false);
+        }
+
         switch ($sort_by) {
             case 'asc':
                 $builder->orderBy('tbl_stok_produk.harga_produk', 'ASC');

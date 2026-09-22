@@ -12,8 +12,10 @@ class M_profil_user extends Model
         'sesi_user',
         'nama_title',
         'notelpon_user',
+        'email_user',
         'jobdesk_user',
-        'level','tampilkan_varian', 'foto_user', 'last_login'];
+        'level','tampilkan_varian', 'foto_user', 'last_login',
+        'reset_token', 'reset_expires'];
 
     public function get_profile()
     {
@@ -62,6 +64,29 @@ class M_profil_user extends Model
     public function updatePassword($id_user, $password)
     {
         return $this->update($id_user, ['password' => $password]);
+    }
+
+    public function findByResetToken($token)
+    {
+        return $this->where('reset_token', $token)
+            ->where('reset_expires >=', date('Y-m-d H:i:s'))
+            ->first();
+    }
+
+    public function setResetToken($id_user, $token, $expires)
+    {
+        return $this->update($id_user, [
+            'reset_token'   => $token,
+            'reset_expires' => $expires,
+        ]);
+    }
+
+    public function clearResetToken($id_user)
+    {
+        return $this->update($id_user, [
+            'reset_token'   => null,
+            'reset_expires' => null,
+        ]);
     }
 
     public function edit($id_user, $data)
