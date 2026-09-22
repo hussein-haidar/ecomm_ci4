@@ -85,7 +85,7 @@
 
             <!-- Toolbar -->
             <div class="no-print d-flex flex-wrap gap-2 align-items-center mb-3">
-                <a href="<?= base_url('pelanggan_kelola_data/riwayat_bayar') ?>" class="btn btn-outline-secondary">
+                <a href="<?= base_url('pelanggan_kelola_data/riwayat_pesanan') ?>" class="btn btn-outline-secondary">
                     <i class="fas fa-arrow-left"></i> Kembali
                 </a>
                 <div class="ms-auto d-flex flex-wrap gap-2">

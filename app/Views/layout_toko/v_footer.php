@@ -458,13 +458,13 @@ function clearRatingFilter() {
 
 <script>
     function logoutPelanggan(event) {
-        const icon = document.getElementById('logout-icon');
-
-        // Simpan warna asli
-        const originalColor = icon.style.color;
-
-        // Ubah warna sementara (jika perlu)
-        icon.style.color = '#3085d6'; // warna biru
+        event?.preventDefault();
+        const icon = document.getElementById('logout-icon') || document.getElementById('logout-icon-drawer');
+        let originalColor = '';
+        if (icon) {
+            originalColor = icon.style.color;
+            icon.style.color = '#3085d6';
+        }
 
         Swal.fire({
             title: 'Yakin ingin logout?',
@@ -478,8 +478,7 @@ function clearRatingFilter() {
         }).then((result) => {
             if (result.isConfirmed) {
                 window.location.href = "<?= base_url('auth/logout_pelanggan') ?>";
-            } else {
-                // Kembalikan warna ikon ke semula jika dibatalkan
+            } else if (icon) {
                 icon.style.color = originalColor;
             }
         });

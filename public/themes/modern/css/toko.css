@@ -1467,7 +1467,6 @@ footer .footer-social ul li a:hover {
 /* ===== Header Main - Modern ===== */
 .header-main {
   background: white;
-  border-bottom: 1px solid #e2e8f0;
   position: sticky;
   top: 0;
   z-index: 1000;

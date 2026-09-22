@@ -77,7 +77,10 @@
                     </tbody>
                 </table>
 
-                <div id="map_pusat" style="height: 400px; width: 100%;"></div>
+                <div class="form-group profile">
+                    <label class="form-label"><strong>Lokasi Terkini</strong></label>
+                    <div id="map_pusat" style="height: 400px; width: 100%;"></div>
+                </div>
 
                 <!-- Input Lokasi Pelanggan -->
                 <input type="hidden" id="latitude_pelanggan" name="latitude" value="<?= isset($latitude) ? $latitude : ''; ?>" readonly>
@@ -86,6 +89,22 @@
                 <div class="form-group profile">
                     <label for="alamat" class="form-label">Alamat Lengkap</label>
                     <input type="text" id="alamat" name="alamat" value="<?= isset($alamat) ? $alamat : ''; ?>" class="form-control" placeholder="Isi alamat lengkap pengiriman" required>
+                </div>
+
+                <hr>
+                <h5><i class="fa fa-truck"></i> Pengiriman</h5>
+
+                <div class="form-group profile">
+                    <label class="form-label"><strong>Pemesan</strong></label>
+                    <input type="text" class="form-control" value="<?= esc(session()->get('nama_pelanggan') ?? '') ?>" readonly style="font-weight:bold;">
+                    <input type="text" class="form-control" value="<?= esc(session()->get('alamat') ?? '') ?>" readonly style="font-size:12px; color:#555; margin-top:2px;">
+                </div>
+
+                <div class="form-group profile">
+                    <label class="form-label"><strong>Pengirim</strong></label>
+                    <input type="text" class="form-control" value="<?= esc($nama_toko ?? 'Toko') ?>" readonly style="font-weight:bold;">
+                    <input type="text" class="form-control" value="<?= esc($alamat_toko ?? 'Alamat toko belum diatur') ?>" readonly style="font-size:12px; color:#555; margin-top:2px;">
+                    <input type="hidden" id="origin_id" value="<?= esc($kode_kota_toko ?? '') ?>">
                 </div>
 
                 <div class="form-group profile">
@@ -115,22 +134,6 @@
                 <div class="form-group profile">
                     <label for="no_rek" class="form-label">No Rekening</label>
                     <input type="text" id="no_rek" name="no_rek" class="form-control" value="" placeholder="No Rek" readonly>
-                </div>
-
-                <hr>
-                <h5><i class="fa fa-truck"></i> Pengiriman</h5>
-
-                <div class="form-group profile">
-                    <label class="form-label"><strong>Pemesan</strong></label>
-                    <input type="text" class="form-control" value="<?= esc(session()->get('nama_pelanggan') ?? '') ?>" readonly style="font-weight:bold;">
-                    <input type="text" class="form-control" value="<?= esc(session()->get('alamat') ?? '') ?>" readonly style="font-size:12px; color:#555; margin-top:2px;">
-                </div>
-
-                <div class="form-group profile">
-                    <label class="form-label"><strong>Pengirim</strong></label>
-                    <input type="text" class="form-control" value="<?= esc($nama_toko ?? 'Toko') ?>" readonly style="font-weight:bold;">
-                    <input type="text" class="form-control" value="<?= esc($alamat_toko ?? 'Alamat toko belum diatur') ?>" readonly style="font-size:12px; color:#555; margin-top:2px;">
-                    <input type="hidden" id="origin_id" value="<?= esc($kode_kota_toko ?? '') ?>">
                 </div>
 
                 <div id="info_jarak" style="display:none; margin-bottom:15px;">
@@ -340,7 +343,7 @@
                     const best = scored[0];
                     document.getElementById('destination_id').value = best.id;
                     document.getElementById('selected_destination').value = best.label;
-                    hitungSemuaOngkir(best.id);
+                    jadwalHitungOngkir();
                 } else {
                     trySearchCheckout(queries, index + 1, lat, lng);
                 }
@@ -366,12 +369,24 @@
             return R * c;
         }
 
+        let ongkirTimer = null;
+        function jadwalHitungOngkir() {
+            const dest = document.getElementById('destination_id').value;
+            if (!dest) return;
+            if (ongkirTimer) clearTimeout(ongkirTimer);
+            ongkirTimer = setTimeout(function() {
+                ongkirTimer = null;
+                hitungSemuaOngkir(document.getElementById('destination_id').value);
+            }, 350);
+        }
+
         function updateInfoJarak(latPelanggan, lngPelanggan) {
             const jarak = haversine(latToko, lngToko, latPelanggan, lngPelanggan);
             const jarakR = Math.round(jarak * 10) / 10;
             document.getElementById('jarak_km').value = jarakR;
             document.getElementById('jarak_text').textContent = jarakR + ' km dari toko';
             document.getElementById('info_jarak').style.display = 'block';
+            jadwalHitungOngkir();
             return jarakR;
         }
 
@@ -394,7 +409,7 @@
                 const latP = parseFloat(document.getElementById('latitude_pelanggan').value) || 0;
                 const lngP = parseFloat(document.getElementById('longitude_pelanggan').value) || 0;
                 if (latP && lngP) updateInfoJarak(latP, lngP);
-                hitungSemuaOngkir(kodeKotaPelanggan);
+                jadwalHitungOngkir();
             }
         });
 
@@ -409,9 +424,10 @@
             document.getElementById("section_ongkir_nasional").style.display = 'none';
 
             const jarakKm = parseFloat(document.getElementById('jarak_km').value) || 0;
+            const pakaiLokal = jarakKm > 0 && jarakKm <= 25;
             const promises = [];
 
-            if (jarakKm > 0 && jarakKm <= 50) {
+            if (pakaiLokal) {
                 const fdLokal = new FormData();
                 fdLokal.append("jarak", jarakKm);
                 promises.push(
@@ -456,7 +472,10 @@
                 loading.style.display = "none";
                 const hasLokal = document.getElementById("section_ongkir_lokal").style.display !== 'none';
                 const hasNasional = document.getElementById("section_ongkir_nasional").style.display !== 'none';
-                if (hasLokal || hasNasional) {
+                if (pakaiLokal && hasLokal) {
+                    document.getElementById("section_ongkir_nasional").style.display = 'none';
+                    hasil.style.display = "block";
+                } else if (hasLokal || hasNasional) {
                     hasil.style.display = "block";
                 } else {
                     document.getElementById("daftar_ongkir_nasional").innerHTML = '<div class="alert alert-warning">Tidak ada layanan pengiriman tersedia untuk tujuan ini.</div>';

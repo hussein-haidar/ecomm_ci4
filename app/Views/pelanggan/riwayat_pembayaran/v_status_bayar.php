@@ -5,7 +5,7 @@
      <!-- Product Section -->
      <main class="product-section">
          <div class="container">
-             <h3>Status Pembayaran</h3>
+             <h3>Menunggu Pembayaran</h3>
 
              <div class="row">
                  <div class="col-md-5 col-12">
@@ -37,7 +37,7 @@
                      <tbody>
                          <?php if (empty($pembayaran)): ?>
                              <tr>
-                                 <td colspan="10" class="text-center">Pembayaran anda kosong, tidak ada yang dibayar</td>
+                                 <td colspan="10" class="text-center">Pembayaran anda kosong, tidak ada pembayaran ditunda</td>
                              </tr>
                          <?php else: ?>
                              <?php $no = 1; ?>

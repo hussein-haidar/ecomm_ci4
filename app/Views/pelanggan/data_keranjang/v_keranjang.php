@@ -81,7 +81,7 @@
                                          <div class="small text-muted">Stok tersedia: <?= (int)$value['jumlah_stok_produk'] ?></div>
                                      </td>
                                      <td class="text-center fw-bold">Rp. <?= number_format($value['total_harga'], 0, ',', '.') ?></td>
-                                     <td class="text-center small"><?= date('d-m-Y H:i', strtotime($value['waktu_ditambahkan'])) ?></td>
+                                     <td class="text-center small"><i class="far fa-clock text-muted me-1"></i><?= date('d F Y H:i', strtotime($value['waktu_ditambahkan'])) ?></td>
                                      <td class="text-center">
                                          <div class="d-flex flex-column align-items-stretch gap-1">
                                              <input type="checkbox" class="checkout-checkbox d-none" value="<?= $value['id_keranjang'] ?>" id="checkbox-<?= $value['id_keranjang'] ?>">

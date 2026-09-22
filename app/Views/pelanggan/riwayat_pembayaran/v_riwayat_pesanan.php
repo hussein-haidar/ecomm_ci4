@@ -1,4 +1,4 @@
- <?= view('layout_toko/v_navbar.php') ?>
+<?= view('layout_toko/v_navbar.php') ?>
 
  <body>
      <!-- Product Section -->

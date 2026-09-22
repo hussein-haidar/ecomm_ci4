@@ -87,6 +87,18 @@ class M_pelanggan_bayar extends Model
             ->get()->getResultArray();
     }
 
+    public function get_riwayat_beli_pelanggan($sesiUserToko, $nama_pelanggan)
+    {
+        return $this->db->table('tbl_data_pembelian')
+            ->select('tbl_data_pembelian.*, tbl_data_produk.foto_produk, tbl_data_pembayaran.id_bayar, tbl_data_pembayaran.waktu_pembayaran, tbl_data_pembayaran.total_bayar')
+            ->join('tbl_data_produk', 'tbl_data_produk.nama_produk = tbl_data_pembelian.nama_produk', 'left')
+            ->join('tbl_data_pembayaran', 'tbl_data_pembayaran.id_beli = tbl_data_pembelian.id_beli', 'left')
+            ->where('tbl_data_pembelian.sesi_user', $sesiUserToko)
+            ->where('tbl_data_pembelian.nama_pelanggan', $nama_pelanggan)
+            ->orderBy('tbl_data_pembelian.id_beli', 'DESC')
+            ->get()->getResultArray();
+    }
+
     public function get_user_by_id($id_bayar)
     {
         return $this->db->table('tbl_data_pembayaran')

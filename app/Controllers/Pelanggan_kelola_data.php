@@ -813,13 +813,13 @@ class pelanggan_kelola_data extends BaseController
 
         // Buka di tab baru
         echo "<script> window.open('$link_wa', '_blank');
-        window.location.href = '" . base_url('pelanggan_kelola_data/status_bayar') . "';
+        window.location.href = '" . base_url('pelanggan_kelola_data/nunggu_bayar') . "';
         </script>";
         exit;
         
     }
 
-    public function status_bayar()
+    public function nunggu_bayar()
     {
         $session = session();
         $sesi_user = $session->get('toko_sesi_user') ?? $session->get('sesi_user');
@@ -897,8 +897,8 @@ class pelanggan_kelola_data extends BaseController
         }
 
         $data = [
-            'title' => 'Riwayat Pembayaran',
-            'title2' => 'Riwayat Pembayaran',
+            'title' => 'Menunggu Pembayaran',
+            'title2' => 'Menunggu Pembayaran',
             'produk_data' => $produk_data,
             'pembayaran' => $pembayaran,
             'jenis_produk_dropdown' => $produkModel->getJenisProdukDropdown($sesi_user),
@@ -908,7 +908,12 @@ class pelanggan_kelola_data extends BaseController
         return view('pelanggan/riwayat_pembayaran/v_status_bayar', $data);
     }
 
-    public function riwayat_bayar()
+    public function status_bayar()
+    {
+        return redirect()->to(base_url('pelanggan_kelola_data/nunggu_bayar'));
+    }
+
+    public function riwayat_pesanan()
     {
         $session = session();
         $tokoSesi = $session->get('toko_sesi_user') ?? $session->get('sesi_user');
@@ -923,7 +928,7 @@ class pelanggan_kelola_data extends BaseController
         }
 
         // Data riwayat hanya untuk pembeli ini di toko yang sedang aktif
-        $pembayaran = $this->M_pelanggan_bayar->get_riwayat_bayar_pelanggan($tokoSesi, $namaPelanggan);
+        $pembayaran = $this->M_pelanggan_bayar->get_riwayat_beli_pelanggan($tokoSesi, $namaPelanggan);
 
         // Produk yang sudah direview oleh pembeli ini di toko aktif
         $reviewModel = new \App\Models\M_review();
@@ -931,8 +936,8 @@ class pelanggan_kelola_data extends BaseController
         $reviewedProducts = array_column($userReviews, 'nama_produk');
 
         $data = [
-            'title' => 'Riwayat Pembayaran',
-            'title2' => 'Riwayat Pembayaran',
+            'title' => 'Riwayat Pemesanan',
+            'title2' => 'Riwayat Pemesanan',
             'produk_data' => $produk_data,
             'pembayaran' => $pembayaran,
             'reviewedProducts' => $reviewedProducts,
@@ -940,7 +945,7 @@ class pelanggan_kelola_data extends BaseController
             'user_logged_in' => $session->get('user_logged_in') === true,
         ];
 
-        return view('pelanggan/riwayat_pembayaran/v_riwayat_bayar', $data);
+        return view('pelanggan/riwayat_pembayaran/v_riwayat_pesanan', $data);
     }
 
     public function nota_pembelian($id_bayar)
@@ -978,12 +983,12 @@ class pelanggan_kelola_data extends BaseController
         $pembayaran = $this->M_pelanggan_bayar->detailBayar($id_bayar);
         if (empty($pembayaran)) {
             session()->setFlashdata('pesan', 'Data pembayaran tidak ditemukan.');
-            return redirect()->to(base_url('pelanggan_kelola_data/riwayat_bayar'));
+            return redirect()->to(base_url('pelanggan_kelola_data/riwayat_pesanan'));
         }
 
         // Hanya pemilik nota yang boleh mengunduh
         if (strcasecmp($pembayaran['nama_pelanggan'] ?? '', $session->get('nama_pelanggan')) !== 0) {
-            return redirect()->to(base_url('pelanggan_kelola_data/riwayat_bayar'));
+            return redirect()->to(base_url('pelanggan_kelola_data/riwayat_pesanan'));
         }
 
         // ---- Siapkan data ----

@@ -1359,7 +1359,6 @@ footer .footer-social ul li a {
 /* ===== Header Main ===== */
 .header-main {
     background: #fff;
-    border-bottom: 1px solid #eee;
     position: sticky;
     top: 0;
     z-index: 1000;

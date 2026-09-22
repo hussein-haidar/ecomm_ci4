@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="<?= base_url() ?>/template_admin/dist/css/AdminLTE.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="<?= base_url('themes/' . ($tokoData['tema_website'] ?? 'default') . '/css/toko.css?v=20260919c') ?>">
+    <link rel="stylesheet" href="<?= base_url('themes/' . ($tokoData['tema_website'] ?? 'default') . '/css/toko.css?v=20260922b') ?>">
     <link href="<?= base_url() ?>/icon/gudang.ico" rel="shortcut icon">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
     <?= view('layout_toko/v_csrf_script') ?>
@@ -136,12 +136,9 @@ if (!empty($nama_pelanggan)) {
                     <i class="fas fa-shopping-cart"></i> <span>Keranjang</span>
                     <?php if ($jumlahBarang > 0): ?><span class="badge-count"><?= $jumlahBarang ?></span><?php endif; ?>
                 </a>
-                <a href="<?= base_url('pelanggan_kelola_data/status_bayar') ?>" class="action-btn" title="Pesanan">
+                <a href="<?= base_url('pelanggan_kelola_data/nunggu_bayar') ?>" class="action-btn" title="Pesanan">
                     <i class="fas fa-box"></i> <span>Pesanan</span>
                     <?php if ($jumlahBayar > 0): ?><span class="badge-count"><?= $jumlahBayar ?></span><?php endif; ?>
-                </a>
-                <a href="<?= base_url('pelanggan_kelola_data/riwayat_bayar') ?>" class="action-btn" title="Riwayat">
-                    <i class="fas fa-history"></i>
                 </a>
                 <a href="#" class="action-btn" onclick="bukaChatPopUp(event)" title="Chat">
                     <i class="fas fa-comments"></i>
@@ -160,11 +157,11 @@ if (!empty($nama_pelanggan)) {
                         <a href="<?= base_url('pelanggan_kelola_data/profil') ?>" class="dropdown-item" role="menuitem">
                             <i class="fas fa-user-circle"></i> Profil
                         </a>
-                        <a href="<?= base_url('pelanggan_kelola_data/riwayat_bayar') ?>" class="dropdown-item" role="menuitem">
+                        <a href="<?= base_url('pelanggan_kelola_data/riwayat_pesanan') ?>" class="dropdown-item" role="menuitem">
                             <i class="fas fa-history"></i> Riwayat Pesanan
                         </a>
                         <a href="#" class="dropdown-item text-danger" onclick="logoutPelanggan(event)" role="menuitem">
-                            <i class="fas fa-sign-out-alt"></i> Keluar
+                            <i class="fas fa-sign-out-alt" id="logout-icon"></i> Keluar
                         </a>
                     </div>
                 </div>
@@ -329,14 +326,14 @@ if (!empty($nama_pelanggan)) {
                             </a>
                         </li>
                         <li>
-                            <a href="<?= base_url('pelanggan_kelola_data/status_bayar') ?>" class="drawer-link">
+                            <a href="<?= base_url('pelanggan_kelola_data/nunggu_bayar') ?>" class="drawer-link">
                                 <i class="fas fa-box"></i> <span>Pesanan Aktif</span>
                                 <?php if ($jumlahBayar > 0): ?><span class="badge-count"><?= $jumlahBayar ?></span><?php endif; ?>
                             </a>
                         </li>
                         <li>
-                            <a href="<?= base_url('pelanggan_kelola_data/riwayat_bayar') ?>" class="drawer-link">
-                                <i class="fas fa-history"></i> <span>Riwayat Pesanan</span>
+                            <a href="<?= base_url('pelanggan_kelola_data/riwayat_pesanan') ?>" class="drawer-link">
+                                <i class="fas fa-history"></i> <span>Riwayat Pemesanan</span>
                             </a>
                         </li>
                         <li>
@@ -352,7 +349,7 @@ if (!empty($nama_pelanggan)) {
                         </li>
                         <li>
                             <a href="#" class="drawer-link danger" onclick="logoutPelanggan(event)">
-                                <i class="fas fa-sign-out-alt"></i> <span>Keluar</span>
+                                <i class="fas fa-sign-out-alt" id="logout-icon-drawer"></i> <span>Keluar</span>
                             </a>
                         </li>
                     </ul>
