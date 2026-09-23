@@ -1,44 +1,83 @@
-<footer>
-    <div class="footer-content">
-        <div>
-            <h4>Tentang Kami</h4>
-            <p><?= get_data_toko()['footer_title'] ?? 'Nama Toko Default'; ?></p>
-        </div>
-        <div>
-            <h4>Link Cepat</h4>
-            <ul>
-                <li><a href="<?= base_url('home_toko/syaket') ?>">Syarat & Ketentuan</a></li>
-                <li><a href="<?= base_url('home_toko/bantuan') ?>">Bantuan / FAQ</a></li>
-            </ul>
-        </div>
-        <div class="marketplace">
-            <h4>Temukan Kami di Sosial Media</h4>
-            <ul>
-
-                <li>
-                    <a href="<?= get_data_toko()['link_IG'] ?? '#' ?>" target="_blank">
-                        <img src="https://img.icons8.com/fluency/24/instagram-new.png" alt="Instagram" style="vertical-align: middle; margin-right: 8px;">
-                        Instagram
-                    </a>
-                </li>
-                <li>
-                    <a href="<?= get_data_toko()['link_FB'] ?? '#' ?>" target="_blank">
-                        <img src="https://img.icons8.com/fluency/24/facebook-new.png" alt="Facebook" style="vertical-align: middle; margin-right: 8px;">
-                        Facebook
-                    </a>
-                </li>
-                <li>
-                    <a href="<?= get_data_toko()['link_Tiktok'] ?? '#' ?>" target="_blank">
-                        <img src="https://img.icons8.com/fluency/24/tiktok.png" alt="TikTok" style="vertical-align: middle; margin-right: 8px;">
-                        Tiktok
-                    </a>
-                </li>
-            </ul>
-        </div>
+<footer class="footer-modern">
+  <div class="footer-container">
+    <?php
+    $ft = get_data_toko();
+    $ft_logo_path = 'logowebsite/' . ($ft['logo_website'] ?? '');
+    $ft_default_logo = 'fotodefault/logofaaro.png';
+    $ft_logo_to_use = file_exists(FCPATH . $ft_logo_path) && !empty($ft['logo_website']) ? $ft_logo_path : $ft_default_logo;
+    $ft_ig = $ft['link_IG'] ?? '#';
+    $ft_fb = $ft['link_FB'] ?? '#';
+    $ft_tt = $ft['link_Tiktok'] ?? '#';
+    $ft_wa = $ft['wa_pusat'] ?? '';
+    $ft_wa_link = !empty($ft_wa) ? 'https://wa.me/' . preg_replace('/[^0-9]/', '', $ft_wa) : '#';
+    ?>
+    <div class="footer-col footer-brand">
+      <img class="fb-logo" src="<?= base_url($ft_logo_to_use) ?>" alt="Logo <?= esc($ft['nama_toko'] ?? 'Toko') ?>">
+      <span class="fb-name"><?= esc($ft['nama_toko'] ?? 'Nama Toko Default') ?></span>
+      <p><?= esc($ft['footer_title'] ?? ($ft['nama_toko'] ?? 'Toko online kami')) ?></p>
     </div>
+
+    <div class="footer-col footer-links">
+      <h4>Link Cepat</h4>
+      <ul>
+        <li><a href="<?= base_url('home_toko/index') ?>"><i class="fas fa-chevron-right"></i> Beranda</a></li>
+        <li><a href="<?= base_url('home_toko/katalog') ?>"><i class="fas fa-chevron-right"></i> Katalog Produk</a></li>
+        <li><a href="<?= base_url('home_toko/syaket') ?>"><i class="fas fa-chevron-right"></i> Syarat &amp; Ketentuan</a></li>
+        <li><a href="<?= base_url('home_toko/bantuan') ?>"><i class="fas fa-chevron-right"></i> Bantuan / FAQ</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col footer-contact">
+      <h4>Hubungi Kami</h4>
+      <ul>
+        <?php if (!empty($ft['alamat_pusat'])) : ?>
+          <li>
+            <span class="fc-icon"><i class="fas fa-map-marker-alt"></i></span>
+            <span><?= esc($ft['alamat_pusat']) ?></span>
+          </li>
+        <?php endif; ?>
+        <li>
+          <span class="fc-icon"><i class="fas fa-phone-alt"></i></span>
+          <span>
+            <?php if ($ft_wa_link !== '#') : ?>
+              <a href="<?= $ft_wa_link ?>" target="_blank"><?= esc($ft_wa) ?></a>
+            <?php else : ?>
+              -
+            <?php endif; ?>
+          </span>
+        </li>
+        <li>
+          <span class="fc-icon"><i class="far fa-clock"></i></span>
+          <span>Senin - Minggu<br>08.00 - 21.00 WIB</span>
+        </li>
+      </ul>
+    </div>
+
+    <div class="footer-col footer-social">
+      <h4>Ikuti Kami</h4>
+      <div class="fs-icons">
+        <a class="fs-ig" href="<?= esc($ft_ig) ?>" target="_blank" title="Instagram"><i class="fab fa-instagram"></i></a>
+        <a class="fs-fb" href="<?= esc($ft_fb) ?>" target="_blank" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+        <a class="fs-tt" href="<?= esc($ft_tt) ?>" target="_blank" title="TikTok"><i class="fab fa-tiktok"></i></a>
+      </div>
+      <div class="footer-extra">
+        <?php if ($ft_wa_link !== '#') : ?>
+          <a href="<?= $ft_wa_link ?>" target="_blank" style="display:inline-flex;align-items:center;gap:8px;background:rgba(37,211,102,0.15);border:1px solid rgba(37,211,102,0.4);color:#7ee2a6;border-radius:10px;padding:8px 14px;text-decoration:none;font-weight:600;font-size:14px;margin-top:12px;">
+            <i class="fab fa-whatsapp" style="font-size:18px;"></i> Chat WhatsApp
+          </a>
+        <?php endif; ?>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    &copy; <?= date('Y') ?> <?= esc($ft['nama_toko'] ?? 'Toko Online') ?> <span class="fb-sep">|</span> Dibuat dengan <i class="fas fa-heart"></i> di Platform Multi-Toko
+  </div>
 </footer>
 
 <?= view('layout_toko/v_chat_popup.php') ?>
+
+</body>
 
 </html>
 

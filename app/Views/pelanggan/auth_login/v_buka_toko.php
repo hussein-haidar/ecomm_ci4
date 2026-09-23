@@ -65,7 +65,7 @@
 
       <p class="text-center text-muted">
         <i class="fa fa-store"></i> Daftar sebagai Pemilik, toko Anda langsung aktif di
-        <strong><?= esc(get_data_toko()['nama_toko'] ?? 'Platform') ?></strong>
+        <strong>Platform Multi-Toko</strong>
       </p>
 
       <!-- Display validation errors -->

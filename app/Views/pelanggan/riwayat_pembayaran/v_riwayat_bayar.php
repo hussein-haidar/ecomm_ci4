@@ -85,8 +85,6 @@
          </div>
      </main>
 
-  </body>
-
   <!-- Modal Review -->
   <div class="modal fade" id="modalReview" tabindex="-1">
     <div class="modal-dialog">

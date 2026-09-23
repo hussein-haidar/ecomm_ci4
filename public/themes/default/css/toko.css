@@ -4,8 +4,7 @@
   box-sizing: border-box;
 }
 
-html,
-body {
+html {
   height: 100%;
 }
 
@@ -17,7 +16,10 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  height: auto;
   margin: 0;
+  overflow-y: visible;
+  overflow-x: clip;
 }
 
 /* Section utama content */
@@ -1116,6 +1118,243 @@ footer .footer-social ul li {
 footer .footer-social ul li a {
   font-size: 14px;
   color: #333;
+}
+
+/* ===== Footer Modern ===== */
+.footer-modern {
+  margin-top: 40px;
+  background: linear-gradient(135deg, #131a2e 0%, #1c2440 45%, #232d52 100%);
+  color: #c6cddd;
+  font-family: inherit;
+  font-size: 14.5px;
+  line-height: 1.7;
+  position: relative;
+  overflow: hidden;
+  padding: 0;
+  text-align: left;
+}
+
+.footer-modern::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, rgb(78, 89, 240), #6c5ce7, #00d4ff, rgb(78, 89, 240));
+  background-size: 300% 100%;
+  animation: footerGradientShift 8s ease infinite;
+}
+
+@keyframes footerGradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.footer-modern .footer-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 48px 24px 32px;
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1.2fr 1fr;
+  gap: 36px;
+}
+
+.footer-modern .footer-col h4 {
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0 0 16px;
+  letter-spacing: 0.4px;
+  position: relative;
+  padding-bottom: 10px;
+}
+
+.footer-modern .footer-col h4::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 34px;
+  height: 3px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, rgb(78, 89, 240), #6c5ce7);
+}
+
+.footer-modern .footer-brand .fb-logo {
+  width: 56px;
+  height: 56px;
+  object-fit: cover;
+  border-radius: 12px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  background: #fff;
+  padding: 3px;
+  margin-bottom: 14px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+}
+
+.footer-modern .footer-brand .fb-name {
+  display: block;
+  color: #ffffff;
+  font-size: 19px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.footer-modern .footer-brand p {
+  margin: 0;
+  color: #aab3c7;
+  text-align: left;
+}
+
+.footer-modern .footer-links ul,
+.footer-modern .footer-contact ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.footer-modern .footer-links li,
+.footer-modern .footer-contact li {
+  margin-bottom: 12px;
+}
+
+.footer-modern .footer-links a {
+  color: #c6cddd;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: color 0.2s, padding-left 0.2s;
+}
+
+.footer-modern .footer-links a i {
+  color: #7d86ff;
+  font-size: 12px;
+  transition: color 0.2s;
+}
+
+.footer-modern .footer-links a:hover {
+  color: #ffffff;
+  padding-left: 6px;
+}
+
+.footer-modern .footer-links a:hover i {
+  color: #ffffff;
+}
+
+.footer-modern .footer-contact li {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  color: #c6cddd;
+}
+
+.footer-modern .footer-contact .fc-icon {
+  flex: 0 0 auto;
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  background: rgba(78, 89, 240, 0.18);
+  color: #9aa3ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  margin-top: 2px;
+}
+
+.footer-modern .footer-contact a {
+  color: #c6cddd;
+  text-decoration: none;
+  transition: color 0.2s;
+  word-break: break-word;
+}
+
+.footer-modern .footer-contact a:hover {
+  color: #ffffff;
+}
+
+.footer-modern .footer-social .fs-icons {
+  display: flex;
+  gap: 10px;
+}
+
+.footer-modern .fs-icons a {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  text-decoration: none;
+  transition: transform 0.2s, background 0.2s, box-shadow 0.2s;
+}
+
+.footer-modern .fs-icons a:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35);
+}
+
+.footer-modern .fs-icons a.fs-ig:hover { background: #e1306c; }
+.footer-modern .fs-icons a.fs-fb:hover { background: #1877f2; }
+.footer-modern .fs-icons a.fs-tt:hover { background: #010101; border-color: #25f4ee; }
+
+.footer-modern .footer-extra {
+  margin-top: 18px;
+}
+
+.footer-modern .footer-extra p {
+  margin: 0;
+  color: #aab3c7;
+}
+
+.footer-modern .footer-bottom {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.25);
+  padding: 16px 24px;
+  text-align: center;
+  font-size: 13px;
+  color: #8b95ad;
+}
+
+.footer-modern .footer-bottom .fb-sep {
+  margin: 0 8px;
+  color: #5a6480;
+}
+
+.footer-modern .footer-bottom i {
+  color: #e25555;
+}
+
+@media (max-width: 900px) {
+  .footer-modern .footer-container {
+    grid-template-columns: 1fr 1fr;
+    gap: 28px;
+    padding: 36px 20px 24px;
+  }
+}
+
+@media (max-width: 540px) {
+  .footer-modern .footer-container {
+    grid-template-columns: 1fr;
+    gap: 28px;
+    text-align: left;
+  }
+
+  .footer-modern .footer-col h4::after {
+    left: 0;
+  }
+
+  .footer-modern .footer-bottom {
+    padding: 14px 16px;
+    line-height: 1.6;
+  }
 }
 
 /* ===== Ulasan Pembeli ===== */

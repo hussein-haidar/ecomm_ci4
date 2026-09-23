@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="<?= base_url() ?>/template_admin/dist/css/AdminLTE.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="<?= base_url('themes/' . ($tokoData['tema_website'] ?? 'default') . '/css/toko.css?v=20260922b') ?>">
+    <link rel="stylesheet" href="<?= base_url('themes/' . ($tokoData['tema_website'] ?? 'default') . '/css/toko.css?v=20260923b') ?>">
     <link href="<?= base_url() ?>/icon/gudang.ico" rel="shortcut icon">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
     <?= view('layout_toko/v_csrf_script') ?>

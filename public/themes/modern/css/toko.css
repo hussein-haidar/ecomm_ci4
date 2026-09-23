@@ -4,8 +4,7 @@
   box-sizing: border-box;
 }
 
-html,
-body {
+html {
   height: 100%;
 }
 
@@ -17,8 +16,11 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  height: auto;
   margin: 0;
   background: #f8fafc;
+  overflow-y: visible;
+  overflow-x: clip;
 }
 
 /* Section utama content */

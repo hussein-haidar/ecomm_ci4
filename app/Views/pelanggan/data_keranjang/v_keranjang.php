@@ -152,6 +152,4 @@
      document.addEventListener('DOMContentLoaded', updateTerpilih);
      </script>
 
- </body>
-
- <?= view('layout_toko/v_footer.php') ?>
+     <?= view('layout_toko/v_footer.php') ?>

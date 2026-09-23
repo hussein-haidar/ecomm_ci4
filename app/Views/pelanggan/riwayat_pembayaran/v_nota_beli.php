@@ -267,6 +267,5 @@
 
         </div>
     </main>
-</body>
 
 <?= view('layout_toko/v_footer.php') ?>

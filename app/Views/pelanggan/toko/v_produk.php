@@ -7,8 +7,6 @@
      <div class="product-grid">
        <?= view('layout_toko/v_produk.php') ?>
      </div>
-   </main>
+</main>
 
- </body>
-
- <?= view('layout_toko/v_footer.php') ?>
+   <?= view('layout_toko/v_footer.php') ?>

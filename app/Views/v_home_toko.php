@@ -40,7 +40,6 @@
             <?= view('layout_toko/v_produk.php') ?>
         </div>
     </main>
-</body>
 
 <?= view('layout_toko/v_footer.php') ?>
 
