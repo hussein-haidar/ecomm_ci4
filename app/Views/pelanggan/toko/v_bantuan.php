@@ -120,6 +120,22 @@
     let currentCategory = 'all';
     let searchTerm = '';
 
+    function setOpen(item, open) {
+        const collapse = item.querySelector('.accordion-collapse');
+        const button = item.querySelector('.accordion-button');
+        if (!collapse || !button) return;
+        if (open) {
+            collapse.classList.remove('collapsed');
+            collapse.classList.add('show');
+            button.classList.remove('collapsed');
+            button.setAttribute('aria-expanded', 'true');
+        } else {
+            collapse.classList.remove('show');
+            button.classList.add('collapsed');
+            button.setAttribute('aria-expanded', 'false');
+        }
+    }
+
     function filterFAQs() {
         let visibleCount = 0;
         faqItems.forEach(item => {
@@ -140,6 +156,13 @@
         });
 
         noResults.style.display = visibleCount === 0 ? 'block' : 'none';
+
+        const visibleItems = [...faqItems].filter(item => item.style.display !== 'none');
+        visibleItems.forEach(item => setOpen(item, false));
+        const firstVisible = visibleItems[0];
+        if (firstVisible) {
+            setOpen(firstVisible, true);
+        }
     }
 
     searchInput.addEventListener('input', function() {
@@ -159,15 +182,6 @@
             this.classList.add('btn-primary');
             currentCategory = this.dataset.category;
             filterFAQs();
-
-            const firstVisible = [...faqItems].find(item => item.style.display !== 'none');
-            if (firstVisible) {
-                const btnHead = firstVisible.querySelector('.accordion-button');
-                const collapse = firstVisible.querySelector('.accordion-collapse');
-                if (!collapse.classList.contains('show')) {
-                    const bs = new bootstrap.Collapse(collapse, { toggle: true });
-                }
-            }
         });
     });
 </script>
