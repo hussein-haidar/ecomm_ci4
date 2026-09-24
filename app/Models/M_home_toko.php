@@ -26,11 +26,13 @@ class M_home_toko extends Model
 
     public function getProduk($sesi_user, $keyword = '', $harga_min = null, $harga_max = null, $sort_by = '', $jenis_produk = '', $rating_min = null)
     {
-        // Ambil semua produk sesuai filter
+        // Ambil semua produk sesuai filter, HANYA toko yang Aktif (is_checked = 2)
         $builder = $this->db->table('tbl_stok_produk')
             ->select('tbl_stok_produk.*, tbl_data_produk.harga_produk, tbl_data_produk.foto_produk, tbl_data_produk.berat_produk')
             ->join('tbl_data_produk', 'tbl_stok_produk.nama_produk = tbl_data_produk.nama_produk')
-            ->where('tbl_stok_produk.sesi_user', $sesi_user);
+            ->join('tbl_website', 'tbl_website.sesi_user = tbl_stok_produk.sesi_user')
+            ->where('tbl_stok_produk.sesi_user', $sesi_user)
+            ->where('tbl_website.is_checked', 2);
 
         if (!empty($keyword)) {
             $builder->groupStart()
@@ -138,7 +140,9 @@ class M_home_toko extends Model
         $builder = $this->db->table('tbl_stok_produk')
             ->select('tbl_stok_produk.*, tbl_data_produk.harga_produk, tbl_data_produk.foto_produk, tbl_data_produk.berat_produk')
             ->join('tbl_data_produk', 'tbl_stok_produk.nama_produk = tbl_data_produk.nama_produk')
+            ->join('tbl_website', 'tbl_website.sesi_user = tbl_stok_produk.sesi_user')
             ->where('tbl_stok_produk.sesi_user', $sesi_user)
+            ->where('tbl_website.is_checked', 2)
             ->where('tbl_stok_produk.jenis_produk', $jenis_produk);
 
         if (!empty($keyword)) {

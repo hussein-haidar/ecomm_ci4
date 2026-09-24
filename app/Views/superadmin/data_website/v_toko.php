@@ -51,12 +51,27 @@ if (session()->getFlashdata('pesan')) {
                             <td>
                                 <a href="<?= base_url('superadmin_kelola_data/detail/' . $value['id_website']) ?>" class="btn btn-info btn-xs"><i class="fa fa-eye"></i></a>
                                 <?php if ($value['is_checked'] == 2) { ?>
-                                    <a href="<?= base_url('superadmin_kelola_data/nonaktifkan/' . $value['id_website']) ?>" class="btn btn-danger btn-xs" onclick="return confirm('Yakin ingin menonaktifkan toko ini?');"><i class="fa fa-times"></i> Nonaktifkan</a>
+                                    <form method="POST" action="<?= base_url('superadmin_kelola_data/update_verifikasi') ?>" class="d-inline" onsubmit="return confirm('Yakin ingin menonaktifkan toko ini?');">
+                                        <?= csrf_field() ?>
+                                        <input type="hidden" name="id_website" value="<?= $value['id_website'] ?>">
+                                        <input type="hidden" name="action" value="tolak">
+                                        <button type="submit" class="btn btn-danger btn-xs"><i class="fa fa-times"></i> Nonaktifkan</button>
+                                    </form>
                                 <?php } elseif ($value['is_checked'] == 0) { ?>
-                                    <a href="<?= base_url('superadmin_kelola_data/aktifkan/' . $value['id_website']) ?>" class="btn btn-success btn-xs" onclick="return confirm('Setujui toko ini?');"><i class="fa fa-check"></i> Setujui</a>
+                                    <form method="POST" action="<?= base_url('superadmin_kelola_data/update_verifikasi') ?>" class="d-inline" onsubmit="return confirm('Setujui toko ini?');">
+                                        <?= csrf_field() ?>
+                                        <input type="hidden" name="id_website" value="<?= $value['id_website'] ?>">
+                                        <input type="hidden" name="action" value="setujui">
+                                        <button type="submit" class="btn btn-success btn-xs"><i class="fa fa-check"></i> Setujui</button>
+                                    </form>
                                     <button type="button" class="btn btn-danger btn-xs" data-toggle="modal" data-target="#tolakModal" data-id="<?= $value['id_website'] ?>" data-nama="<?= esc($value['nama_toko']) ?>"><i class="fa fa-times"></i> Tolak</button>
                                 <?php } else { ?>
-                                    <a href="<?= base_url('superadmin_kelola_data/aktifkan/' . $value['id_website']) ?>" class="btn btn-success btn-xs" onclick="return confirm('Yakin ingin mengaktifkan toko ini?');"><i class="fa fa-check"></i> Aktifkan</a>
+                                    <form method="POST" action="<?= base_url('superadmin_kelola_data/update_verifikasi') ?>" class="d-inline" onsubmit="return confirm('Yakin ingin mengaktifkan toko ini?');">
+                                        <?= csrf_field() ?>
+                                        <input type="hidden" name="id_website" value="<?= $value['id_website'] ?>">
+                                        <input type="hidden" name="action" value="setujui">
+                                        <button type="submit" class="btn btn-success btn-xs"><i class="fa fa-check"></i> Aktifkan</button>
+                                    </form>
                                 <?php } ?>
                             </td>
                         </tr>
@@ -73,9 +88,10 @@ if (session()->getFlashdata('pesan')) {
 <div class="modal fade" id="tolakModal" tabindex="-1" role="dialog" aria-labelledby="tolakModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
-      <form method="POST" action="<?= base_url('superadmin_kelola_data/nonaktifkan') ?>" id="tolakForm">
+      <form method="POST" action="<?= base_url('superadmin_kelola_data/update_verifikasi') ?>" id="tolakForm">
         <?= csrf_field() ?>
         <input type="hidden" name="id_website" id="tolak_id_website">
+        <input type="hidden" name="action" value="tolak">
         <div class="modal-header bg-danger text-white">
           <h5 class="modal-title" id="tolakModalLabel"><i class="fa fa-times-circle"></i> Tolak Pendaftaran Toko</h5>
           <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
