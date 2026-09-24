@@ -55,7 +55,7 @@ class M_pemilik_website extends Model
             $sesi_user = session()->get('sesi_user');
         }
         return $this->db->table('tbl_website')
-            ->select('id_website, sesi_user, nama_toko, is_checked, logo_website')
+            ->select('id_website, sesi_user, nama_toko, is_checked, logo_website, alasan_tolak')
             ->where('tbl_website.sesi_user', $sesi_user)
             ->orderBy('id_website', 'DESC')
             ->get()->getRowArray();

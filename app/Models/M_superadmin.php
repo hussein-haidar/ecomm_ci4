@@ -119,13 +119,17 @@ class M_superadmin extends Model
             ->get()->getRowArray();
     }
 
-    public function update_checked($id_website, $is_checked)
+    public function update_checked($id_website, $is_checked, $alasan_tolak = null)
     {
+        $data = [
+            'is_checked' => $is_checked,
+            'updated_at' => date('Y-m-d H:i:s'),
+        ];
+        if ($alasan_tolak !== null) {
+            $data['alasan_tolak'] = $alasan_tolak;
+        }
         return $this->db->table('tbl_website')
             ->where('id_website', $id_website)
-            ->update([
-                'is_checked' => $is_checked,
-                'updated_at' => date('Y-m-d H:i:s'),
-            ]);
+            ->update($data);
     }
 }

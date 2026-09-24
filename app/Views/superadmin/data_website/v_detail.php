@@ -66,7 +66,7 @@
             <a href="<?= base_url('superadmin_kelola_data/nonaktifkan/' . $toko['id_website']) ?>" class="btn btn-danger" onclick="return confirm('Yakin ingin menonaktifkan toko ini?');"><i class="fa fa-times"></i> Nonaktifkan</a>
         <?php } elseif ($toko['is_checked'] == 0) { ?>
             <a href="<?= base_url('superadmin_kelola_data/aktifkan/' . $toko['id_website']) ?>" class="btn btn-success" onclick="return confirm('Setujui toko ini?');"><i class="fa fa-check"></i> Setujui</a>
-            <a href="<?= base_url('superadmin_kelola_data/nonaktifkan/' . $toko['id_website']) ?>" class="btn btn-danger" onclick="return confirm('Tolak toko ini?');"><i class="fa fa-times"></i> Tolak</a>
+            <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#tolakModal" data-id="<?= $toko['id_website'] ?>" data-nama="<?= esc($toko['nama_toko']) ?>"><i class="fa fa-times"></i> Tolak</button>
         <?php } else { ?>
             <a href="<?= base_url('superadmin_kelola_data/aktifkan/' . $toko['id_website']) ?>" class="btn btn-success" onclick="return confirm('Yakin ingin mengaktifkan toko ini?');"><i class="fa fa-check"></i> Aktifkan</a>
         <?php } ?>
@@ -74,3 +74,43 @@
     <!-- /.box-body -->
 </div>
 <!-- /.box -->
+
+<!-- Modal Tolak Toko -->
+<div class="modal fade" id="tolakModal" tabindex="-1" role="dialog" aria-labelledby="tolakModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <form method="POST" action="<?= base_url('superadmin_kelola_data/nonaktifkan') ?>" id="tolakForm">
+        <?= csrf_field() ?>
+        <input type="hidden" name="id_website" id="tolak_id_website">
+        <div class="modal-header bg-danger text-white">
+          <h5 class="modal-title" id="tolakModalLabel"><i class="fa fa-times-circle"></i> Tolak Pendaftaran Toko</h5>
+          <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>
+        <div class="modal-body">
+          <p>Anda akan menolak toko <strong id="tolak_nama_toko"></strong>.</p>
+          <div class="form-group">
+            <label for="alasan_tolak">Alasan Penolakan <span class="text-danger">*</span></label>
+            <textarea name="alasan_tolak" id="alasan_tolak" class="form-control" rows="4" placeholder="Tulis alasan penolakan di sini..." required></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+          <button type="submit" class="btn btn-danger">Ya, Tolak & Simpan Alasan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+$(function () {
+    $('#tolakModal').on('show.bs.modal', function (e) {
+        var btn = $(e.relatedTarget);
+        var id = btn.data('id');
+        var nama = btn.data('nama');
+        $('#tolak_id_website').val(id);
+        $('#tolak_nama_toko').text(nama);
+        $('#alasan_tolak').val('');
+    });
+});
+</script>

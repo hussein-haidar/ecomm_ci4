@@ -47,7 +47,8 @@ class Superadmin_kelola_data extends BaseController
 
     public function nonaktifkan($id_website)
     {
-        $this->M_superadmin->update_checked($id_website, 1);
+        $alasan = $this->request->getPost('alasan_tolak') ?? $this->request->getGet('alasan_tolak');
+        $this->M_superadmin->update_checked($id_website, 1, $alasan);
         session()->setFlashdata('pesan', 'Toko Berhasil Dinonaktifkan !!!');
         return redirect()->to(base_url('superadmin_kelola_data/toko'));
     }

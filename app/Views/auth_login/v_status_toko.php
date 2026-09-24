@@ -85,6 +85,13 @@
         <p class="text-muted">Toko Anda sudah aktif. Silakan login untuk mengelola toko.</p>
       <?php endif; ?>
 
+      <?php if (!empty($toko['alasan_tolak']) && (int) ($toko['is_checked'] ?? 2) === 1): ?>
+        <div class="alert alert-danger mt-3">
+          <strong><i class="fa fa-exclamation-triangle"></i> Alasan Penolakan:</strong>
+          <div class="mt-2"><?= nl2br(esc($toko['alasan_tolak'])) ?></div>
+        </div>
+      <?php endif; ?>
+
       <a href="<?= base_url('auth/login_user') ?>" class="btn btn-primary"><i class="fa fa-sign-in-alt"></i> Halaman Login</a>
       <a href="<?= base_url('auth/pilih_toko_user') ?>" class="btn btn-default"><i class="fa fa-store"></i> Pilih Toko</a>
     </div>
