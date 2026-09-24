@@ -51,6 +51,8 @@ class Filters extends BaseConfig
 					'auth/*',
 					'home_toko',       // Halaman publik
 					'home_toko/*',     // Sub-rute publik
+					'platform_kebijakan',       // Kebijakan platform (publik)
+					'platform_kebijakan/*',     // Kebijakan platform (publik)
 					'review',          // Review publik
 					'review/*',        // Review publik
 					'api_store',       // REST API publik
@@ -64,6 +66,8 @@ class Filters extends BaseConfig
 					'home_superadmin/*',
 					'superadmin_kelola_data',
 					'superadmin_kelola_data/*',
+					'superadmin_kebijakan_platform',
+					'superadmin_kebijakan_platform/*',
 				],
 			],
 			//'honeypot',
@@ -76,10 +80,14 @@ class Filters extends BaseConfig
 				'home_pemilik/*',
 				'home_toko',
 				'home_toko/*',
+				'platform_kebijakan',
+				'platform_kebijakan/*',
 				'home_superadmin',
 				'home_superadmin/*',
 				'superadmin_kelola_data',
 				'superadmin_kelola_data/*',
+				'superadmin_kebijakan_platform',
+				'superadmin_kebijakan_platform/*',
 				'api_store',
 				'api_store/*',
 				'pelanggan_kelola_data',
@@ -109,10 +117,14 @@ class Filters extends BaseConfig
 				'home_admin/*',
 				'home_toko',
 				'home_toko/*',
+				'platform_kebijakan',
+				'platform_kebijakan/*',
 				'home_superadmin',
 				'home_superadmin/*',
 				'superadmin_kelola_data',
 				'superadmin_kelola_data/*',
+				'superadmin_kebijakan_platform',
+				'superadmin_kebijakan_platform/*',
 				'api_store',
 				'api_store/*',
 				'pelanggan_kelola_data',
@@ -138,6 +150,8 @@ class Filters extends BaseConfig
 'filter_pelanggan' => ['except' => [
 				'home_toko',
 				'home_toko/*',
+				'platform_kebijakan',
+				'platform_kebijakan/*',
 				'home_admin',
 				'home_admin/*',
 				'home_pemilik',
@@ -146,6 +160,8 @@ class Filters extends BaseConfig
 				'home_superadmin/*',
 				'superadmin_kelola_data',
 				'superadmin_kelola_data/*',
+				'superadmin_kebijakan_platform',
+				'superadmin_kebijakan_platform/*',
 				'api_store',
 				'api_store/*',
 				'update_profile',
@@ -185,8 +201,8 @@ class Filters extends BaseConfig
 	 */
 	public $filters = [
 		'filter_superadmin' => [
-			'before' => ['home_superadmin', 'home_superadmin/*', 'superadmin_kelola_data', 'superadmin_kelola_data/*'],
-			'after' => ['home_superadmin', 'home_superadmin/*', 'superadmin_kelola_data', 'superadmin_kelola_data/*'],
+			'before' => ['home_superadmin', 'home_superadmin/*', 'superadmin_kelola_data', 'superadmin_kelola_data/*', 'superadmin_kebijakan_platform', 'superadmin_kebijakan_platform/*'],
+			'after' => ['home_superadmin', 'home_superadmin/*', 'superadmin_kelola_data', 'superadmin_kelola_data/*', 'superadmin_kebijakan_platform', 'superadmin_kebijakan_platform/*'],
 		],
 	];
 }

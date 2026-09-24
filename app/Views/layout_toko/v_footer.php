@@ -24,6 +24,8 @@
         <li><a href="<?= base_url('home_toko/katalog') ?>"><i class="fas fa-chevron-right"></i> Katalog Produk</a></li>
         <li><a href="<?= base_url('home_toko/syaket') ?>"><i class="fas fa-chevron-right"></i> Syarat &amp; Ketentuan</a></li>
         <li><a href="<?= base_url('home_toko/bantuan') ?>"><i class="fas fa-chevron-right"></i> Bantuan / FAQ</a></li>
+        <li><a href="<?= base_url('platform_kebijakan/bantuan') ?>"><i class="fas fa-chevron-right"></i> Bantuan / FAQ Platform</a></li>
+        <li><a href="<?= base_url('platform_kebijakan/syaket') ?>"><i class="fas fa-chevron-right"></i> Syarat &amp; Ketentuan Platform</a></li>
       </ul>
     </div>
 

@@ -233,7 +233,7 @@ class Home_toko extends BaseController
         $sktModel = new M_kebijakan_toko();
         $skt_data = $sktModel->get_skt_by_sesi($sesi_user);
         if (empty($skt_data)) {
-            $skt_data = $this->default_syaket();
+            $skt_data = $this->platform_syaket();
         }
 
         $data = [
@@ -260,7 +260,7 @@ class Home_toko extends BaseController
         $sktModel = new M_kebijakan_toko();
         $faq_data = $sktModel->get_faq_by_sesi($sesi_user);
         if (empty($faq_data)) {
-            $faq_data = $this->default_bantuan();
+            $faq_data = $this->platform_bantuan();
         }
 
         $data = [
@@ -285,7 +285,27 @@ class Home_toko extends BaseController
         return redirect()->to(base_url('auth/login_pelanggan'));
     }
 
-    // Fallback default bila belum ada data kebijakan di database
+    // Fallback data kebijakan: ambil dari platform (lintas toko).
+    private function platform_bantuan()
+    {
+        $platform = new \App\Models\M_platform_kebijakan();
+        $faq = $platform->get_all_faq();
+        if (!empty($faq)) {
+            return $faq;
+        }
+        return $this->default_bantuan();
+    }
+
+    private function platform_syaket()
+    {
+        $platform = new \App\Models\M_platform_kebijakan();
+        $skt = $platform->get_all_skt();
+        if (!empty($skt)) {
+            return $skt;
+        }
+        return $this->default_syaket();
+    }
+
     private function default_bantuan()
     {
         return [
