@@ -4,7 +4,7 @@
 <div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-lg-9">
-            {{-- Header --}}
+            <!-- Header -->
             <div class="text-center mb-5" data-aos="fade-up">
                 <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-3" style="width: 80px; height: 80px; font-size: 2rem; background: rgba(102, 126, 234, 0.1); color: #667eea;">
                     <i class="fas fa-question-circle"></i>
@@ -13,7 +13,7 @@
                 <p class="text-muted">Temukan jawaban atas pertanyaan umum seputar belanja di <strong><?= esc($tokoData['nama_toko'] ?? 'Toko') ?></strong></p>
             </div>
 
-            {{-- Search FAQ --}}
+            <!-- Search FAQ -->
             <div class="card border-0 shadow-sm mb-5" data-aos="fade-up" data-aos-delay="100">
                 <div class="card-body p-4">
                     <div class="position-relative">
@@ -23,7 +23,7 @@
                 </div>
             </div>
 
-            {{-- FAQ Categories --}}
+            <!-- FAQ Categories -->
             <div class="d-flex flex-wrap gap-2 justify-content-center mb-5" data-aos="fade-up" data-aos-delay="200" id="faqCategories">
                 <button class="btn btn-primary rounded-pill px-4 active" data-category="all">Semua</button>
                 <button class="btn btn-outline-primary rounded-pill px-4" data-category="pemesanan">Pemesanan</button>
@@ -33,7 +33,7 @@
                 <button class="btn btn-outline-primary rounded-pill px-4" data-category="akun">Akun &amp; Profil</button>
             </div>
 
-            {{-- FAQ Accordion --}}
+            <!-- FAQ Accordion -->
             <div class="accordion accordion-flush" id="faqAccordion">
                 <?php
                 $faq_groups = [];
@@ -65,14 +65,14 @@
                 <?php endforeach; ?>
             </div>
 
-            {{-- No Results Message --}}
+            <!-- No Results Message -->
             <div id="faqNoResults" class="text-center py-5 d-none" data-aos="fade-up">
                 <i class="fas fa-search fa-3x text-muted mb-3"></i>
                 <h5 class="text-muted">Tidak Ada Hasil</h5>
                 <p class="text-muted">Coba kata kunci lain atau pilih kategori berbeda.</p>
             </div>
 
-            {{-- Contact CTA --}}
+            <!-- Contact CTA -->
             <div class="card border-0 shadow-sm mt-5" data-aos="fade-up" data-aos-delay="300" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
                 <div class="card-body p-5 text-white text-center">
                     <h4 class="fw-bold mb-3">Masih Butuh Bantuan?</h4>

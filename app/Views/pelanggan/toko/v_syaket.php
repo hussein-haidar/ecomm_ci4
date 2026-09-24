@@ -4,7 +4,7 @@
 <div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-lg-9">
-            {{-- Header --}}
+            <!-- Header -->
             <div class="text-center mb-5" data-aos="fade-up">
                 <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-3" style="width: 80px; height: 80px; font-size: 2rem; background: rgba(102, 126, 234, 0.1); color: #667eea;">
                     <i class="fas fa-file-contract"></i>
@@ -13,7 +13,7 @@
                 <p class="text-muted">Terakhir diperbarui: <?= date('d F Y') ?></p>
             </div>
 
-            {{-- Intro --}}
+            <!-- Intro -->
             <div class="card border-0 shadow-sm mb-5" data-aos="fade-up" data-aos-delay="100">
                 <div class="card-body p-4 p-lg-5">
                     <p class="lead text-muted mb-0">
@@ -24,7 +24,7 @@
                 </div>
             </div>
 
-            {{-- Terms Content --}}
+            <!-- Terms Content -->
             <div class="card border-0 shadow-sm" data-aos="fade-up" data-aos-delay="200">
                 <div class="card-body p-4 p-lg-5">
                     <div class="terms-content">
@@ -42,7 +42,7 @@
                 </div>
             </div>
 
-            {{-- Contact CTA --}}
+            <!-- Contact CTA -->
             <div class="text-center mt-5" data-aos="fade-up" data-aos-delay="300">
                 <div class="card border-0 shadow-sm" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
                     <div class="card-body p-5 text-white">
