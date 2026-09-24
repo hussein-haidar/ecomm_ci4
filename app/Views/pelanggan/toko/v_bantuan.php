@@ -45,22 +45,20 @@
                 }
                 ?>
 
-                <?php $first = true; ?>
                 <?php foreach ($faq_groups as $category => $items): ?>
                     <?php foreach ($items as $index => $faq): ?>
                         <div class="accordion-item faq-item" data-category="<?= $category ?>" data-aos="fade-up" data-aos-delay="<?= ($index * 30) + 100 ?>">
                             <h2 class="accordion-header" id="heading<?= ucfirst($category) ?><?= $index + 1 ?>">
-                                <button class="accordion-button <?= ($first && $category === 'pemesanan') ? '' : 'collapsed' ?>" type="button" data-bs-toggle="collapse" data-bs-target="#collapse<?= ucfirst($category) ?><?= $index + 1 ?>" aria-expanded="<?= ($first && $category === 'pemesanan') ? 'true' : 'false' ?>" aria-controls="collapse<?= ucfirst($category) ?><?= $index + 1 ?>">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse<?= ucfirst($category) ?><?= $index + 1 ?>" aria-expanded="false" aria-controls="collapse<?= ucfirst($category) ?><?= $index + 1 ?>">
                                     <?= esc($faq['q']) ?>
                                 </button>
                             </h2>
-                            <div id="collapse<?= ucfirst($category) ?><?= $index + 1 ?>" class="accordion-collapse collapse <?= ($first && $category === 'pemesanan') ? 'show' : '' ?>" aria-labelledby="heading<?= ucfirst($category) ?><?= $index + 1 ?>" data-bs-parent="#faqAccordion">
+                            <div id="collapse<?= ucfirst($category) ?><?= $index + 1 ?>" class="accordion-collapse collapse" aria-labelledby="heading<?= ucfirst($category) ?><?= $index + 1 ?>" data-bs-parent="#faqAccordion">
                                 <div class="accordion-body">
                                     <?= $faq['a'] ?>
                                 </div>
                             </div>
                         </div>
-                        <?php $first = false; ?>
                     <?php endforeach; ?>
                 <?php endforeach; ?>
             </div>
@@ -161,6 +159,15 @@
             this.classList.add('btn-primary');
             currentCategory = this.dataset.category;
             filterFAQs();
+
+            const firstVisible = [...faqItems].find(item => item.style.display !== 'none');
+            if (firstVisible) {
+                const btnHead = firstVisible.querySelector('.accordion-button');
+                const collapse = firstVisible.querySelector('.accordion-collapse');
+                if (!collapse.classList.contains('show')) {
+                    const bs = new bootstrap.Collapse(collapse, { toggle: true });
+                }
+            }
         });
     });
 </script>
