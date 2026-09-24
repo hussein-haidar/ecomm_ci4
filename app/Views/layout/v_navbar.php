@@ -24,6 +24,20 @@
          <ul class="sidebar-menu" data-widget="tree">
              <li class="header">MAIN NAVIGATION</li>
 
+             <?php if (session()->get('level') == 0) { ?>
+                 <li>
+                     <a href="<?= base_url('home_superadmin/index') ?>">
+                         <i class="fa fa-dashboard"></i> <span>Dashboard</span>
+                     </a>
+                 </li>
+                 <li class="header">KELOLA PLATFORM</li>
+                 <li>
+                     <a href="<?= base_url('superadmin_kelola_data/toko') ?>">
+                         <i class="fa fa-building"></i> <span>Data Toko</span>
+                     </a>
+                 </li>
+             <?php } ?>
+
              <?php if (session()->get('level') == 1) { ?>
                  <li>
                      <a href="<?= base_url('home_pemilik/index') ?>">
@@ -117,6 +131,21 @@
                          <li><a href="<?= base_url('pemilik_kelola_user/pelanggan') ?>"><i class="fa fa-circle-o"></i>Data Pelanggan Toko</a></li>
                      </ul>
                  </li>
+
+                 <li class="header">KEBIJAKAN NAVIGATION</li>
+                 <li class="treeview">
+                     <a href="#">
+                         <i class="fa fa-folder"></i>
+                         <span>Kebijakan Toko</span>
+                         <span class="pull-right-container">
+                             <i class="fa fa-angle-left pull-right"></i>
+                         </span>
+                     </a>
+                     <ul class="treeview-menu">
+                         <li><a href="<?= base_url('kebijakan_toko/faq') ?>"><i class="fa fa-circle-o"></i>Data FAQ (Bantuan)</a></li>
+                         <li><a href="<?= base_url('kebijakan_toko/syarat') ?>"><i class="fa fa-circle-o"></i>Syarat &amp; Ketentuan</a></li>
+                     </ul>
+                 </li>
              <?php } ?>
 
              <?php if (session()->get('level') == 2) { ?>
@@ -180,6 +209,23 @@
                      <a href="<?= base_url('admin_kelola_data/bayar') ?>">
                          <i class="fa fa-folder"></i> <span>Pembayaran Pelanggan</span>
                      </a>
+                 </li>
+             <?php } ?>
+
+             <?php if (session()->get('level') == 2) { ?>
+                 <li class="header">KEBIJAKAN NAVIGATION</li>
+                 <li class="treeview">
+                     <a href="#">
+                         <i class="fa fa-folder"></i>
+                         <span>Kebijakan Toko</span>
+                         <span class="pull-right-container">
+                             <i class="fa fa-angle-left pull-right"></i>
+                         </span>
+                     </a>
+                     <ul class="treeview-menu">
+                         <li><a href="<?= base_url('kebijakan_toko/faq') ?>"><i class="fa fa-circle-o"></i>Data FAQ (Bantuan)</a></li>
+                         <li><a href="<?= base_url('kebijakan_toko/syarat') ?>"><i class="fa fa-circle-o"></i>Syarat &amp; Ketentuan</a></li>
+                     </ul>
                  </li>
              <?php } ?>
 

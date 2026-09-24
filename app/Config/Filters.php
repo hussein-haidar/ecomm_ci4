@@ -23,6 +23,7 @@ class Filters extends BaseConfig
 		'filter_admin' => \App\Filters\Filter_admin::class,
 		'filter_pelanggan' => \App\Filters\Filter_pelanggan::class,
 		'filter_toko' => \App\Filters\Filter_toko::class,
+		'filter_superadmin' => \App\Filters\Filter_superadmin::class,
 	];
 
 	/**
@@ -59,6 +60,10 @@ class Filters extends BaseConfig
 					'pelanggan_kelola_data/review_get', // Ulasan publik (rating kartu & detail)
 					'pelanggan_kelola_data/review_get/*', // Ulasan publik (rating kartu & detail)
 					'pelanggan_kelola_data/midtrans_notification', // Webhook Midtrans (tanpa session)
+					'home_superadmin',
+					'home_superadmin/*',
+					'superadmin_kelola_data',
+					'superadmin_kelola_data/*',
 				],
 			],
 			//'honeypot',
@@ -71,6 +76,10 @@ class Filters extends BaseConfig
 				'home_pemilik/*',
 				'home_toko',
 				'home_toko/*',
+				'home_superadmin',
+				'home_superadmin/*',
+				'superadmin_kelola_data',
+				'superadmin_kelola_data/*',
 				'api_store',
 				'api_store/*',
 				'pelanggan_kelola_data',
@@ -87,6 +96,8 @@ class Filters extends BaseConfig
 				'admin_laporan_mingguan/*',
 				'admin_laporan_bulanan',
 				'admin_laporan_bulanan/*',
+				'kebijakan_toko',
+				'kebijakan_toko/*',
 				'auth',
 				'auth/*',
 			]],
@@ -98,6 +109,10 @@ class Filters extends BaseConfig
 				'home_admin/*',
 				'home_toko',
 				'home_toko/*',
+				'home_superadmin',
+				'home_superadmin/*',
+				'superadmin_kelola_data',
+				'superadmin_kelola_data/*',
 				'api_store',
 				'api_store/*',
 				'pelanggan_kelola_data',
@@ -114,6 +129,8 @@ class Filters extends BaseConfig
 				'pemilik_kelola_data/*',
 				'pemilik_kelola_website',
 				'pemilik_kelola_website/*',
+				'kebijakan_toko',
+				'kebijakan_toko/*',
 				'auth',
 				'auth/*',
 			]],
@@ -125,6 +142,10 @@ class Filters extends BaseConfig
 				'home_admin/*',
 				'home_pemilik',
 				'home_pemilik/*',
+				'home_superadmin',
+				'home_superadmin/*',
+				'superadmin_kelola_data',
+				'superadmin_kelola_data/*',
 				'api_store',
 				'api_store/*',
 				'update_profile',
@@ -162,5 +183,10 @@ class Filters extends BaseConfig
 	 *
 	 * @var array
 	 */
-	public $filters = [];
+	public $filters = [
+		'filter_superadmin' => [
+			'before' => ['home_superadmin', 'home_superadmin/*', 'superadmin_kelola_data', 'superadmin_kelola_data/*'],
+			'after' => ['home_superadmin', 'home_superadmin/*', 'superadmin_kelola_data', 'superadmin_kelola_data/*'],
+		],
+	];
 }

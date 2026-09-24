@@ -59,7 +59,13 @@
         <header class="main-header">
             <!-- Logo -->
             <a href="#" class="logo">
-                <?php $nama_toko = get_data_toko()['nama_toko'] ?? 'Nama Toko Default'; ?>
+                <?php
+                if ((int) session()->get('level') === 0) {
+                    $nama_toko = 'Superadmin Panel';
+                } else {
+                    $nama_toko = get_data_toko()['nama_toko'] ?? 'Nama Toko Default';
+                }
+                ?>
 
                 <!-- mini logo for sidebar mini 50x50 pixels -->
                 <span class="logo-mini">
@@ -135,6 +141,51 @@
 
         <!-- =============================================== -->
     <?php } ?>
+
+    <?php if ((int) session()->get('level') === 0) { ?>
+        <!-- User Account: style can be found in dropdown.less -->
+        <li class="dropdown user user-menu">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                <img src="<?= base_url('fotouser/' . session()->get('foto_user')) ?>" class="user-image" alt="User Image">
+                <span class="hidden-xs"><?= session()->get('nama_lengkap') ?></span>
+            </a>
+            <ul class="dropdown-menu">
+                <!-- User image -->
+                <li class="user-header">
+                    <img src="<?= base_url('fotouser/' . session()->get('foto_user')) ?>" class="img-circle" alt="User Image">
+                    <p>
+                        <?= session()->get('nama_lengkap') ?>
+                        <small>Level :&nbsp;Superadmin
+                            <br>
+                            Last Login : <?= session()->get('last_login') ?>
+                        </small>
+                        </br>
+                    </p>
+                </li>
+
+                <!-- Menu Footer-->
+                <li class="user-footer">
+                    <div class="pull-left">
+                        <a href="<?= base_url('home_superadmin/profil') ?>" class="btn btn-default btn-flat"><i class="fa fa-fw fa-user"></i>&nbsp;Profile</a>
+                    </div>
+                    <div class="pull-right">
+                        <button class="btn btn-default btn-flat" onclick="logoutConfirm()"><i class="fa fa-fw fa-key"></i>&nbsp;Sign Out</button></td>
+                    </div>
+                </li>
+            </ul>
+        </li>
+
+        <!-- Control Sidebar Toggle Button -->
+        <li>
+            <a href="#" data-toggle="control-sidebar"><i class="fa fa-gears"></i></a>
+        </li>
+        </ul>
+    </div>
+    </nav>
+    </header>
+
+    <!-- =============================================== -->
+<?php } ?>
 
     <?php if (session()->get('level') == 2) { ?>
 

@@ -141,6 +141,14 @@
           </div>
         </div>
 
+        <div class="row" style="margin-top: 5px;">
+          <div class="col-xs-12">
+            <a href="<?= base_url('auth/login_superadmin') ?>" class="btn btn-link">
+              <i class="fa fa-shield"></i> Login Superadmin
+            </a>
+          </div>
+        </div>
+
       </div>
       <!-- /.login-box-body -->
     </div>

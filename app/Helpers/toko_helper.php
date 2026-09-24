@@ -30,6 +30,7 @@ if (!function_exists('get_data_toko')) {
                 'logo_website' => $data[0]['logo_website'],
                 'bgd_web' => $data[0]['bgd_web'],
                 'tema_website' => $data[0]['tema_website'] ?? 'default',
+                'email_toko' => strtolower(str_replace(' ', '', $data[0]['nama_toko'])) . '@gmail.com',
                 'is_checked' => $data[0]['is_checked']
             ];
         } else {

@@ -371,6 +371,94 @@ class Auth extends BaseController
         return view('auth_login/v_login', $data);
     }
 
+    public function login_superadmin()
+    {
+        // Jika sudah login sebagai superadmin, langsung redirect ke dashboard
+        if (session()->get('level') === "0") {
+            return redirect()->to(base_url('home_superadmin'));
+        }
+
+        $data = [
+            'title' => 'Login Superadmin',
+            'title2' => 'Login Superadmin',
+        ];
+        return view('auth_login/v_login_superadmin', $data);
+    }
+
+    public function cek_login_superadmin()
+    {
+        if ($this->validate([
+            'username' => [
+                'label' => 'Nama Pengguna',
+                'rules' => 'required',
+                'errors' => [
+                    'required' => '{field} Wajib Diisi !!!'
+                ]
+            ],
+            'password' => [
+                'label' => 'Kata Sandi',
+                'rules' => 'required',
+                'errors' => [
+                    'required' => '{field} Wajib Diisi !!!'
+                ]
+            ],
+        ])) {
+            $username = $this->request->getPost('username');
+            $password = $this->request->getPost('password');
+
+            $user = $this->M_profil_user->findByUsername($username);
+            if ($user) {
+                if ($user['password'] === $password) {
+                    if ((int) $user['level'] !== 0) {
+                        session()->setFlashdata('pesan_warning', 'Akun ini bukan Superadmin!');
+                        return redirect()->to(base_url('auth/login_superadmin'));
+                    }
+
+                    // Bersihkan sisa session pelanggan agar tidak tercampur
+                    session()->remove([
+                        'nama_pelanggan', 'id_pelanggan', 'email', 'jenis_kelamin',
+                        'no_telpon', 'tanggal_lahir', 'longitude', 'latitude',
+                        'alamat', 'foto_pelanggan', 'kode_kota', 'nama_kota'
+                    ]);
+
+                    // Login session superadmin
+                    $userData = [
+                        'id_user' => $user['id_user'],
+                        'username' => $user['username'],
+                        'password' => $user['password'],
+                        'nama_lengkap' => $user['nama_lengkap'],
+                        'sesi_user' => $user['sesi_user'],
+                        'nama_title' => $user['nama_title'],
+                        'notelpon_user' => $user['notelpon_user'],
+                        'jobdesk_user' => $user['jobdesk_user'],
+                        'foto_user' => $user['foto_user'],
+                        'level' => $user['level'],
+                        'user_logged_in' => true,
+                        'last_login' => $user['last_login'],
+                    ];
+
+                    session()->set('log', true);
+                    session()->set($userData);
+
+                    // Update waktu login terakhir
+                    $this->M_profil_user->updateLastLogin($user['id_user']);
+                    session()->setFlashdata('pesan_welcome', 'Selamat Datang, ' . $user['nama_lengkap'] . '!');
+
+                    return redirect()->to(base_url('home_superadmin'));
+                } else {
+                    session()->setFlashdata('pesan_warning', 'Login Gagal, Password Salah!');
+                    return redirect()->to(base_url('auth/login_superadmin'));
+                }
+            } else {
+                session()->setFlashdata('pesan_warning', 'Login Gagal, Username Tidak Ditemukan!');
+                return redirect()->to(base_url('auth/login_superadmin'));
+            }
+        } else {
+            session()->setFlashdata('errors', \Config\Services::validation()->getErrors());
+            return redirect()->to(base_url('auth/login_superadmin'));
+        }
+    }
+
     public function cek_login_user()
     {
         if ($this->validate([
@@ -443,6 +531,8 @@ class Auth extends BaseController
 
                     // Redirect berdasarkan level
                     switch ($user['level']) {
+                        case 0:
+                            return redirect()->to(base_url('home_superadmin'));
                         case 1:
                             return redirect()->to(base_url('home_pemilik'));
                         case 2:
@@ -469,6 +559,8 @@ class Auth extends BaseController
 
     public function logout_user()
     {
+        $level = (int) session()->get('level');
+
         // Hapus semua session login (admin/pemilik & sisa pelanggan)
         session()->remove([
             'username', 'id_user', 'level', 'user_logged_in', 'nama_lengkap', 'sesi_user',
@@ -481,6 +573,9 @@ class Auth extends BaseController
         session()->setFlashdata('pesan_success', 'Logout Berhasil !');
 
         // Redirect ke halaman login
+        if ($level === 0) {
+            return redirect()->to(base_url('auth/login_superadmin'));
+        }
         return redirect()->to(base_url('auth/login_user'));
     }
 
