@@ -41,6 +41,8 @@ if (session()->getFlashdata('pesan')) {
                             <td>
                                 <?php if ($value['is_checked'] == 2) { ?>
                                     <span class="label label-success">Aktif</span>
+                                <?php } elseif ($value['is_checked'] == 0) { ?>
+                                    <span class="label label-warning">Menunggu Verifikasi</span>
                                 <?php } else { ?>
                                     <span class="label label-danger">Nonaktif</span>
                                 <?php } ?>
@@ -50,6 +52,9 @@ if (session()->getFlashdata('pesan')) {
                                 <a href="<?= base_url('superadmin_kelola_data/detail/' . $value['id_website']) ?>" class="btn btn-info btn-xs"><i class="fa fa-eye"></i></a>
                                 <?php if ($value['is_checked'] == 2) { ?>
                                     <a href="<?= base_url('superadmin_kelola_data/nonaktifkan/' . $value['id_website']) ?>" class="btn btn-danger btn-xs" onclick="return confirm('Yakin ingin menonaktifkan toko ini?');"><i class="fa fa-times"></i> Nonaktifkan</a>
+                                <?php } elseif ($value['is_checked'] == 0) { ?>
+                                    <a href="<?= base_url('superadmin_kelola_data/aktifkan/' . $value['id_website']) ?>" class="btn btn-success btn-xs" onclick="return confirm('Setujui toko ini?');"><i class="fa fa-check"></i> Setujui</a>
+                                    <a href="<?= base_url('superadmin_kelola_data/nonaktifkan/' . $value['id_website']) ?>" class="btn btn-danger btn-xs" onclick="return confirm('Tolak toko ini?');"><i class="fa fa-times"></i> Tolak</a>
                                 <?php } else { ?>
                                     <a href="<?= base_url('superadmin_kelola_data/aktifkan/' . $value['id_website']) ?>" class="btn btn-success btn-xs" onclick="return confirm('Yakin ingin mengaktifkan toko ini?');"><i class="fa fa-check"></i> Aktifkan</a>
                                 <?php } ?>

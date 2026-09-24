@@ -55,22 +55,21 @@
               <td><img src="<?= base_url('logowebsite/' . $value['logo_website']) ?>" class="img-circle" width="80px" height="80px"></td>
               <td><img src="<?= base_url('bgdweb/' . $value['bgd_web']) ?>" class="img-circle" width="80px" height="80px"></td>
               <td>
-                <!-- Tombol status dengan warna berdasarkan nilai terbaru -->
-                <label class="me-3">
-                  Status Toko:
-                </label>
-                <!-- Tombol status dengan warna berdasarkan nilai terbaru -->
-                <form method="post" action="<?= base_url('pemilik_kelola_website/update_checked') ?>" class="d-inline">
-                  <?= csrf_field() ?>
-                  <input type="hidden" name="id_website" value="<?= $value['id_website']; ?>">
-                  <input type="hidden" name="is_checked" value="<?= $value['is_checked'] == 1 ? '2' : '1'; ?>">
-
-                  <button type="submit"
-                    class="btn btn-xs"
-                    style="cursor: pointer; <?= $value['is_checked'] == 2 ? 'background-color: #5cb85c; color: white;' : 'background-color: #d9534f; color: white;' ?>">
-                    <?= $value['is_checked'] == 2 ? 'Aktif' : 'Non Aktif' ?>
-                  </button>
-                </form>
+                <label class="me-3">Status Toko:</label>
+                <?php if ($value['is_checked'] == 2) { ?>
+                  <form method="post" action="<?= base_url('pemilik_kelola_website/update_checked') ?>" class="d-inline">
+                    <?= csrf_field() ?>
+                    <input type="hidden" name="id_website" value="<?= $value['id_website']; ?>">
+                    <input type="hidden" name="is_checked" value="1">
+                    <button type="submit" class="btn btn-xs" style="cursor: pointer; background-color: #5cb85c; color: white;">
+                      Aktif - Nonaktifkan Toko
+                    </button>
+                  </form>
+                <?php } elseif ($value['is_checked'] == 0) { ?>
+                  <span class="label label-warning">Menunggu Verifikasi Superadmin</span>
+                <?php } else { ?>
+                  <span class="label label-danger">Nonaktif (oleh Superadmin)</span>
+                <?php } ?>
                 <a href=" <?= base_url('pemilik_kelola_website/edit/' . $value['id_website']) ?>" class="btn btn-xs btn-warning"><i class="fa fa-fw fa-edit"></i>Edit</a>
                 <button class="btn btn-danger btn-xs" data-toggle="modal" data-target="#delete<?= $value['id_website'] ?>"><i class="fa fa-fw fa-trash"></i>Delete</button>
               </td>

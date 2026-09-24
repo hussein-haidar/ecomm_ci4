@@ -24,6 +24,7 @@ class Filters extends BaseConfig
 		'filter_pelanggan' => \App\Filters\Filter_pelanggan::class,
 		'filter_toko' => \App\Filters\Filter_toko::class,
 		'filter_superadmin' => \App\Filters\Filter_superadmin::class,
+		'filter_toko_aktif' => \App\Filters\Filter_toko_aktif::class,
 	];
 
 	/**
@@ -203,6 +204,9 @@ class Filters extends BaseConfig
 		'filter_superadmin' => [
 			'before' => ['home_superadmin', 'home_superadmin/*', 'superadmin_kelola_data', 'superadmin_kelola_data/*', 'superadmin_kebijakan_platform', 'superadmin_kebijakan_platform/*'],
 			'after' => ['home_superadmin', 'home_superadmin/*', 'superadmin_kelola_data', 'superadmin_kelola_data/*', 'superadmin_kebijakan_platform', 'superadmin_kebijakan_platform/*'],
+		],
+		'filter_toko_aktif' => [
+			'before' => ['home_toko', 'home_toko/*'],
 		],
 	];
 }

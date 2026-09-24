@@ -32,8 +32,22 @@ class Pemilik_kelola_website extends BaseController
         $id_website = $this->request->getPost('id_website');
         $is_checked = $this->request->getPost('is_checked');
 
-        // Perbarui status di database + waktu update
-        $this->M_pemilik_website->update_checked($id_website, $is_checked);
+        $toko = $this->M_pemilik_website->detailWebsite($id_website);
+
+        // Hanya pemilik toko yang berhak
+        if (!$toko || $toko['sesi_user'] !== session()->get('sesi_user')) {
+            session()->setFlashdata('pesan', 'Anda tidak berhak mengubah status toko ini!');
+            return redirect()->to(base_url('pemilik_kelola_website/index'));
+        }
+
+        // Pemilik hanya boleh menonaktifkan tokonya sendiri (Aktif -> Nonaktif).
+        // Aktifasi/verifikasi hanya bisa dilakukan Superadmin.
+        if ((int) $toko['is_checked'] === 2 && (int) $is_checked === 1) {
+            $this->M_pemilik_website->update_checked($id_website, 1);
+            session()->setFlashdata('pesan', 'Status toko diubah menjadi Nonaktif.');
+        } else {
+            session()->setFlashdata('pesan', 'Aktifasi/verifikasi toko hanya bisa dilakukan oleh Superadmin.');
+        }
 
         // Redirect kembali ke halaman utama
         return redirect()->to(base_url('pemilik_kelola_website/index'));

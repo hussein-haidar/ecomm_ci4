@@ -29,6 +29,14 @@ class M_superadmin extends Model
             ->get()->getRow()->total ?? 0;
     }
 
+    public function tot_toko_menunggu()
+    {
+        return $this->db->table('tbl_website')
+            ->selectCount('id_website', 'total')
+            ->where('is_checked', 0)
+            ->get()->getRow()->total ?? 0;
+    }
+
     public function tot_pemilik()
     {
         return $this->db->table('tbl_data_user')

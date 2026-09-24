@@ -62,6 +62,27 @@
     .toko-card .btn-pilih {
       margin-top: 12px;
     }
+    .toko-card.disabled {
+      cursor: not-allowed;
+      opacity: 0.75;
+      filter: grayscale(0.4);
+    }
+    .toko-card.disabled:hover {
+      border-color: #e0e0e0;
+      box-shadow: none;
+      transform: none;
+    }
+    .status-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .status-aktif { background: #d4edda; color: #155724; }
+    .status-pending { background: #fff3cd; color: #856404; }
+    .status-nonaktif { background: #f8d7da; color: #721c24; }
   </style>
   <?= view('layout_toko/v_csrf_script') ?>
 </head>
@@ -79,19 +100,32 @@
       <div class="alert alert-info text-center">Belum ada toko tersedia.</div>
     <?php else: ?>
       <?php foreach ($toko_list as $toko): ?>
+        <?php $isAktif = (int) $toko['is_checked'] === 2; ?>
         <form method="POST" action="<?= base_url('auth/set_toko_user') ?>">
           <?= csrf_field() ?>
           <input type="hidden" name="sesi_user_toko" value="<?= esc($toko['sesi_user']) ?>">
-          <div class="toko-card" onclick="this.closest('form').submit();">
+          <div class="toko-card<?= $isAktif ? '' : ' disabled' ?>"<?= $isAktif ? ' onclick="this.closest(\'form\').submit();"' : '' ?>>
             <img src="<?= base_url($toko['logo']) ?>" alt="<?= esc($toko['nama_toko']) ?>">
             <h4><?= esc($toko['nama_toko']) ?></h4>
+            <?php if ((int) $toko['is_checked'] === 0): ?>
+              <span class="status-badge status-pending">Menunggu Verifikasi</span>
+            <?php elseif ((int) $toko['is_checked'] === 1): ?>
+              <span class="status-badge status-nonaktif">Nonaktif</span>
+            <?php else: ?>
+              <span class="status-badge status-aktif">Aktif</span>
+            <?php endif; ?>
+            <br>
             <?php if (!empty($toko['alamat'])): ?>
               <small><i class="fa fa-map-marker"></i> <?= esc($toko['alamat']) ?></small>
             <?php endif; ?>
             <br>
-            <button type="submit" class="btn btn-primary btn-sm btn-pilih">
-              <i class="fa fa-arrow-right"></i> Pilih Toko Ini
-            </button>
+            <?php if ($isAktif): ?>
+              <button type="submit" class="btn btn-primary btn-sm btn-pilih">
+                <i class="fa fa-arrow-right"></i> Pilih Toko Ini
+              </button>
+            <?php else: ?>
+              <span class="btn btn-default btn-sm btn-pilih disabled"><i class="fa fa-lock"></i> Belum Bisa Login</span>
+            <?php endif; ?>
           </div>
         </form>
       <?php endforeach; ?>

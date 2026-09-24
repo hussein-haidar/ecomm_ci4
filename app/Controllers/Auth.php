@@ -134,6 +134,33 @@ class Auth extends BaseController
         return view('pelanggan/auth_login/v_buka_toko', $data);
     }
 
+    public function status_toko()
+    {
+        $tokoSesi = session()->get('toko_sesi_user');
+
+        $websiteModel = new \App\Models\M_pemilik_website();
+        $toko = $websiteModel->get_status_website($tokoSesi);
+
+        $status = ['label' => 'Tidak Diketahui', 'warna' => 'warning'];
+        if ($toko) {
+            if ((int) $toko['is_checked'] === 2) {
+                $status = ['label' => 'Aktif', 'warna' => 'success'];
+            } elseif ((int) $toko['is_checked'] === 0) {
+                $status = ['label' => 'Menunggu Verifikasi', 'warna' => 'warning'];
+            } else {
+                $status = ['label' => 'Nonaktif', 'warna' => 'danger'];
+            }
+        }
+
+        $data = [
+            'title' => 'Status Toko',
+            'title2' => 'Status Toko',
+            'toko' => $toko,
+            'status' => $status,
+        ];
+        return view('auth_login/v_status_toko', $data);
+    }
+
     public function save_buka_toko()
     {
         if ($this->validate([
@@ -202,7 +229,7 @@ class Auth extends BaseController
                 'last_login' => date('Y-m-d H:i:s'),
             ]);
 
-            // 2) Auto-buat data toko (tema default, langsung aktif / is_checked=2)
+            // 2) Auto-buat data toko (tema default, status awal menunggu verifikasi / is_checked=0)
             $websiteModel = new \App\Models\M_pemilik_website();
             $websiteModel->add([
                 'sesi_user' => $namaLengkap,
@@ -212,7 +239,7 @@ class Auth extends BaseController
                 'wa_pusat' => $this->request->getPost('wa_pusat') ?? '',
                 'footer_title' => $this->request->getPost('nama_toko'),
                 'tema_website' => 'default',
-                'is_checked' => 2,
+                'is_checked' => 0,
             ]);
 
             // Bersihkan sisa session pelanggan agar tidak tercampur
@@ -222,24 +249,14 @@ class Auth extends BaseController
                 'alamat', 'foto_pelanggan', 'kode_kota', 'nama_kota'
             ]);
 
-            // 3) Langsung login sebagai pemilik ke toko barunya
+            // 3) Tidak langsung login; arahkan ke halaman status verifikasi.
+            //    Toko baru berstatus "Menunggu Verifikasi" sampai disetujui superadmin.
             session()->set([
-                'id_user' => $idUser,
-                'username' => $username,
-                'nama_lengkap' => $namaLengkap,
-                'sesi_user' => $namaLengkap,
-                'nama_title' => $this->request->getPost('nama_title') ?: 'Dashboard Pemilik',
-                'notelpon_user' => $this->request->getPost('notelpon_user'),
-                'jobdesk_user' => $this->request->getPost('jobdesk_user') ?: 'Pemilik',
-                'foto_user' => $nama_file,
-                'level' => 1,
-                'user_logged_in' => true,
-                'log' => true,
                 'toko_sesi_user' => $namaLengkap,
             ]);
 
-            session()->setFlashdata('pesan_welcome', 'Selamat Datang, ' . $namaLengkap . '! Toko Anda aktif dan siap dikelola.');
-            return redirect()->to(base_url('home_pemilik'));
+            session()->setFlashdata('pesan_welcome', 'Toko "' . $this->request->getPost('nama_toko') . '" berhasil didaftarkan! Status: Menunggu Verifikasi Superadmin.');
+            return redirect()->to(base_url('auth/status_toko'));
         } else {
             // Jika tidak valid
             session()->setFlashdata('errors', \Config\Services::validation()->getErrors());
@@ -497,6 +514,17 @@ class Auth extends BaseController
                         session()->setFlashdata('pesan_warning', 'Anda bukan anggota toko ini! Silakan pilih toko yang benar.');
                         session()->remove('toko_sesi_user');
                         return redirect()->to(base_url('auth/pilih_toko_user'));
+                    }
+
+                    // Cek status verifikasi toko (hanya toko Aktif yang boleh login)
+                    $websiteModel = new \App\Models\M_pemilik_website();
+                    $statusToko = $websiteModel->get_status_website($tokoDipilih);
+                    if (!$statusToko || (int) $statusToko['is_checked'] !== 2) {
+                        $pesan = $statusToko && (int) $statusToko['is_checked'] === 0
+                            ? 'Akun toko Anda masih "Menunggu Verifikasi" superadmin. Silakan cek kembali setelah disetujui.'
+                            : 'Toko Anda berstatus Nonaktif. Silakan hubungi superadmin.';
+                        session()->setFlashdata('pesan_warning', $pesan);
+                        return redirect()->to(base_url('auth/status_toko'));
                     }
 
                     // Bersihkan sisa session pelanggan agar tidak tercampur
@@ -1056,7 +1084,7 @@ session()->setFlashdata('pesan_welcome', 'Selamat Datang, ' . $user['nama_pelang
     public function pilih_toko_user()
     {
         $model = new \App\Models\M_pemilik_website();
-        $semuaToko = $model->get_website_aktif();
+        $semuaToko = $model->get_all_website_user();
 
         $toko_list = [];
         foreach ($semuaToko as $toko) {
@@ -1064,12 +1092,21 @@ session()->setFlashdata('pesan_welcome', 'Selamat Datang, ' . $user['nama_pelang
             $default_logo = 'fotodefault/logofaaro.png';
             $logo = file_exists(FCPATH . $logo_path) && !empty($toko['logo_website']) ? $logo_path : $default_logo;
 
+            $status_label = 'Aktif';
+            if ((int) $toko['is_checked'] === 0) {
+                $status_label = 'Menunggu Verifikasi';
+            } elseif ((int) $toko['is_checked'] === 1) {
+                $status_label = 'Nonaktif';
+            }
+
             $toko_list[] = [
                 'id_website'  => $toko['id_website'],
                 'sesi_user'   => $toko['sesi_user'],
                 'nama_toko'   => $toko['nama_toko'],
                 'logo'        => $logo,
                 'alamat'      => $toko['alamat_pusat'] ?? '',
+                'is_checked'  => $toko['is_checked'],
+                'status_label' => $status_label,
             ];
         }
 
@@ -1087,6 +1124,14 @@ session()->setFlashdata('pesan_welcome', 'Selamat Datang, ' . $user['nama_pelang
 
         if (empty($sesiUserToko)) {
             session()->setFlashdata('pesan_warning', 'Pilih toko terlebih dahulu!');
+            return redirect()->to(base_url('auth/pilih_toko_user'));
+        }
+
+        // Hanya toko Aktif yang boleh dipilih untuk login pemilik/admin
+        $websiteModel = new \App\Models\M_pemilik_website();
+        $toko = $websiteModel->get_status_website($sesiUserToko);
+        if (!$toko || (int) $toko['is_checked'] !== 2) {
+            session()->setFlashdata('pesan_warning', 'Toko "' . ($toko['nama_toko'] ?? $sesiUserToko) . '" belum aktif (menunggu verifikasi/nonaktif).');
             return redirect()->to(base_url('auth/pilih_toko_user'));
         }
 

@@ -69,6 +69,20 @@ if (session()->getFlashdata('message') && !session()->getFlashdata('pesan_welcom
         <!-- small box -->
         <div class="small-box bg-yellow">
             <div class="inner">
+                <h3> <?= $tot_toko_menunggu ?></h3>
+                <p>Toko Menunggu Verifikasi</p>
+            </div>
+            <div class="icon">
+                <i class="ion ion-clock"></i>
+            </div>
+        </div>
+    </div>
+    <!-- ./col -->
+
+    <div class="col-lg-3 col-xs-6">
+        <!-- small box -->
+        <div class="small-box bg-yellow">
+            <div class="inner">
                 <h3> <?= $tot_produk ?></h3>
                 <p>Total Produk (Semua Toko)</p>
             </div>

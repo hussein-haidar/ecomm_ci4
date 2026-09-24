@@ -22,6 +22,7 @@ class Home_superadmin extends BaseController
             'tot_toko' => $this->M_superadmin->tot_toko(),
             'tot_toko_aktif' => $this->M_superadmin->tot_toko_aktif(),
             'tot_toko_nonaktif' => $this->M_superadmin->tot_toko_nonaktif(),
+            'tot_toko_menunggu' => $this->M_superadmin->tot_toko_menunggu(),
             'tot_pemilik' => $this->M_superadmin->tot_pemilik(),
             'tot_admin' => $this->M_superadmin->tot_admin(),
             'tot_pelanggan' => $this->M_superadmin->tot_pelanggan(),

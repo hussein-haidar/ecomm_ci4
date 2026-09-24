@@ -41,6 +41,26 @@ class M_pemilik_website extends Model
             ->get()->getResultArray();
     }
 
+    public function get_all_website_user()
+    {
+        return $this->db->table('tbl_website')
+            ->select('tbl_website.*')
+            ->orderBy('id_website', 'DESC')
+            ->get()->getResultArray();
+    }
+
+    public function get_status_website($sesi_user = null)
+    {
+        if ($sesi_user === null) {
+            $sesi_user = session()->get('sesi_user');
+        }
+        return $this->db->table('tbl_website')
+            ->select('id_website, sesi_user, nama_toko, is_checked, logo_website')
+            ->where('tbl_website.sesi_user', $sesi_user)
+            ->orderBy('id_website', 'DESC')
+            ->get()->getRowArray();
+    }
+
     public function get_website_aktif()
     {
         return $this->db->table('tbl_website')
