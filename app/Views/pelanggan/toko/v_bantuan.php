@@ -47,7 +47,7 @@
 
                 <?php foreach ($faq_groups as $category => $items): ?>
                     <?php foreach ($items as $index => $faq): ?>
-                        <div class="accordion-item faq-item" data-category="<?= $category ?>" data-aos="fade-up" data-aos-delay="<?= ($index * 30) + 100 ?>">
+                        <div class="accordion-item faq-item" data-category="<?= $category ?>">
                             <h2 class="accordion-header" id="heading<?= ucfirst($category) ?><?= $index + 1 ?>">
                                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse<?= ucfirst($category) ?><?= $index + 1 ?>" aria-expanded="false" aria-controls="collapse<?= ucfirst($category) ?><?= $index + 1 ?>">
                                     <?= esc($faq['q']) ?>
@@ -157,12 +157,7 @@
 
         noResults.style.display = visibleCount === 0 ? 'block' : 'none';
 
-        const visibleItems = [...faqItems].filter(item => item.style.display !== 'none');
-        visibleItems.forEach(item => setOpen(item, false));
-        const firstVisible = visibleItems[0];
-        if (firstVisible) {
-            setOpen(firstVisible, true);
-        }
+        faqItems.forEach(item => setOpen(item, false));
     }
 
     searchInput.addEventListener('input', function() {
