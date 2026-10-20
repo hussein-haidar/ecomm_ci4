@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 
 <head>
@@ -37,11 +37,12 @@
   <?php
   $toko = get_data_toko();
   $bgd_path = 'bgdweb/' . ($toko['bgd_web'] ?? '');
-  $default_bgd = 'fotodefault/bgdefault.jpeg';
-  $bgd_to_use = file_exists(FCPATH . $bgd_path) && !empty($toko['bgd_web']) ? $bgd_path : $default_bgd;
+  $default_bgd = 'fotodefault/bg_open_store.jpg';
+  $bgd_to_use = 'fotodefault/bg_open_store.jpg';
   ?>.login-page {
     background: url('<?= base_url($bgd_to_use) ?>') no-repeat center center fixed;
     background-size: cover;
+    background-position: center;
   }
 
   .login-logo {

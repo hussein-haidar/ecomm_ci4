@@ -102,7 +102,17 @@ class Pemilik_kelola_website extends BaseController
             $nama_bgd = $bgd ? $bgd->getRandomName() : '';
 
             if ($logo && $logo->isValid()) $logo->move('logowebsite', $nama_logo);
-            if ($bgd && $bgd->isValid()) $bgd->move('bgdweb', $nama_bgd);
+            if ($bgd && $bgd->isValid()) {
+                $imgInfo = @getimagesize($bgd->getTempName());
+                if ($imgInfo !== false && ($imgInfo[0] < 1280 || $imgInfo[1] < 720)) {
+                    session()->setFlashdata('errors', [
+                        "Resolusi gambar background {$imgInfo[0]}x{$imgInfo[1]}px kurang dari rekomendasi 1280x720px. "
+                        . "Silakan upload gambar dengan resolusi minimal 1280x720px (disarankan 1920x1080px)."
+                    ]);
+                    return redirect()->to(base_url('pemilik_kelola_website/add'));
+                }
+                $bgd->move('bgdweb', $nama_bgd);
+            }
 
             $data = [
                 'sesi_user' => $this->request->getPost('sesi_user'),
@@ -212,6 +222,14 @@ class Pemilik_kelola_website extends BaseController
         }
 
         if ($bgd && $bgd->isValid() && !$bgd->hasMoved()) {
+            $imgInfo = @getimagesize($bgd->getTempName());
+            if ($imgInfo !== false && ($imgInfo[0] < 1280 || $imgInfo[1] < 720)) {
+                session()->setFlashdata('errors', [
+                    "Resolusi gambar background {$imgInfo[0]}x{$imgInfo[1]}px kurang dari rekomendasi 1280x720px. "
+                    . "Silakan upload gambar dengan resolusi minimal 1280x720px (disarankan 1920x1080px)."
+                ]);
+                return redirect()->to(base_url('pemilik_kelola_website/edit/' . $id_website));
+            }
             if (!empty($data_website['bgd_web'])) @unlink('bgdweb/' . $data_website['bgd_web']);
             $nama_bgd = $bgd->getRandomName();
             $bgd->move('bgdweb', $nama_bgd);
