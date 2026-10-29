@@ -158,4 +158,13 @@ class Chat_admin_pembeli extends BaseController
 
         return $this->response->setJSON(['conversations' => $inbox]);
     }
+
+    public function api_session_expiry()
+    {
+        if (!$this->isPelanggan() && !$this->isAdminToko()) {
+            return $this->response->setJSON(['expiry_at' => null]);
+        }
+        $expiresAt = session()->get('login_expires_at');
+        return $this->response->setJSON(['expiry_at' => $expiresAt]);
+    }
 }

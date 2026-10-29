@@ -118,6 +118,8 @@ class Home_toko extends BaseController
             $this->M_pelanggan_bayar->batalkanTransaksiExpiredByUser($nama_pelanggan);
         }
 
+        $viewMode = $this->request->getVar('view') ?: 'grid';
+
         $data = [
             'produk_data' => $produk_data,
             'title2' => 'Katalog Produk',
@@ -132,7 +134,9 @@ class Home_toko extends BaseController
                 'sort_by' => $sort_by,
                 'jenis_produk' => $jenis_produk,
                 'rating_min' => $rating_min,
-            ]
+            ],
+            'view_mode' => $viewMode,
+            'data_banner' => (new M_pemilik_banner())->get_banner_aktif($sesi_user),
         ];
 
         return view('pelanggan/toko/v_katalog', $data);

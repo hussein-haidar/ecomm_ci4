@@ -22,6 +22,7 @@
               <th width="1%">No</th>
               <th>Pembeli</th>
               <th>Produk</th>
+              <th width="60">Foto</th>
               <th>Pesan Terakhir</th>
               <th>Waktu</th>
               <th>Aksi</th>
@@ -29,11 +30,27 @@
           </thead>
           <tbody>
             <?php $no = 1;
-            foreach ($chat_list as $c): ?>
+            foreach ($chat_list as $c):
+              $fotoProduk = $c['foto_produk'] ?? '';
+            ?>
               <tr>
                 <td><?= $no++; ?></td>
                 <td><?= esc($c['nama_pelanggan']) ?></td>
                 <td><?= esc($c['nama_produk']) ?></td>
+                <td>
+                  <?php if ($fotoProduk): ?>
+                    <img src="<?= base_url('fotoproduk/' . $fotoProduk) ?>" alt="<?= esc($c['nama_produk']) ?>"
+                         style="width:50px;height:50px;object-fit:cover;border-radius:6px;border:1px solid #eee;"
+                         onerror="this.style.display='none';this.nextElementSibling.style.display='block';">
+                    <div style="display:none;width:50px;height:50px;align-items:center;justify-content:center;background:#f0f0f0;border-radius:6px;">
+                      <i class="fa fa-box text-muted"></i>
+                    </div>
+                  <?php else: ?>
+                    <div style="width:50px;height:50px;display:flex;align-items:center;justify-content:center;background:#f0f0f0;border-radius:6px;">
+                      <i class="fa fa-box text-muted"></i>
+                    </div>
+                  <?php endif; ?>
+                </td>
                 <td>
                   <?php $nama_terakhir = $c['nama_pengirim'] ?: ($c['pengirim_terakhir'] === 'pelanggan' ? 'Pembeli' : 'Anda'); ?>
                   <?= $c['pengirim_terakhir'] === 'pelanggan'

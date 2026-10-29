@@ -24,10 +24,12 @@ class M_chat extends Model
 
     public function get_inbox_admin($sesi_user)
     {
-        $rows = $this->db->table('tbl_chat')
-            ->select('nama_pelanggan, nama_produk, id_stok, MAX(id_chat) as id_terakhir')
-            ->where('sesi_user', $sesi_user)
-            ->groupBy('nama_pelanggan, nama_produk')
+        $rows = $this->db->table('tbl_chat as c')
+            ->select('c.nama_pelanggan, c.nama_produk, c.id_stok, c.sesi_user, MAX(c.id_chat) as id_terakhir,
+                      p.foto_produk')
+            ->join('tbl_data_produk as p', "p.nama_produk = c.nama_produk AND p.sesi_user = c.sesi_user", 'left')
+            ->where('c.sesi_user', $sesi_user)
+            ->groupBy('c.nama_pelanggan, c.nama_produk')
             ->orderBy('id_terakhir', 'DESC')
             ->get()
             ->getResultArray();
@@ -44,6 +46,7 @@ class M_chat extends Model
             $result[] = [
                 'nama_pelanggan'    => $row['nama_pelanggan'],
                 'nama_produk'       => $row['nama_produk'],
+                'foto_produk'       => $row['foto_produk'] ?? '',
                 'nama_pengirim'     => $last['nama_pengirim'] ?? '',
                 'pesan_terakhir'    => $last['pesan'] ?? '',
                 'pengirim_terakhir' => $last['pengirim'] ?? '',
@@ -56,11 +59,13 @@ class M_chat extends Model
 
     public function get_inbox_pelanggan($sesi_user, $nama_pelanggan)
     {
-        $rows = $this->db->table('tbl_chat')
-            ->select('nama_produk, id_stok, MAX(id_chat) as id_terakhir')
-            ->where('sesi_user', $sesi_user)
-            ->where('nama_pelanggan', $nama_pelanggan)
-            ->groupBy('nama_produk')
+        $rows = $this->db->table('tbl_chat as c')
+            ->select('c.nama_produk, c.id_stok, c.sesi_user, MAX(c.id_chat) as id_terakhir,
+                      p.foto_produk')
+            ->join('tbl_data_produk as p', "p.nama_produk = c.nama_produk AND p.sesi_user = c.sesi_user", 'left')
+            ->where('c.sesi_user', $sesi_user)
+            ->where('c.nama_pelanggan', $nama_pelanggan)
+            ->groupBy('c.nama_produk')
             ->orderBy('id_terakhir', 'DESC')
             ->get()
             ->getResultArray();
@@ -77,6 +82,7 @@ class M_chat extends Model
             $result[] = [
                 'nama_produk'       => $row['nama_produk'],
                 'id_stok'           => $row['id_stok'] ?? 0,
+                'foto_produk'       => $row['foto_produk'] ?? '',
                 'nama_pengirim'     => $last['nama_pengirim'] ?? '',
                 'pesan_terakhir'    => $last['pesan'] ?? '',
                 'pengirim_terakhir' => $last['pengirim'] ?? '',

@@ -17,9 +17,19 @@
                     <ul class="list-group list-group-flush">
                         <?php foreach ($chat_list as $c): ?>
                         <li class="list-group-item d-flex align-items-center gap-3">
-                            <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold flex-shrink-0" style="width:42px;height:42px;">
-                                <i class="fas fa-store"></i>
-                            </div>
+                            <?php $fotoProduk = $c['foto_produk'] ?? ''; ?>
+                            <?php if ($fotoProduk): ?>
+                                <img src="<?= base_url('fotoproduk/' . $fotoProduk) ?>" alt="<?= esc($c['nama_produk']) ?>"
+                                     style="width:42px;height:42px;object-fit:cover;border-radius:50%;border:1px solid #eee;flex-shrink:0;flex:0 0 42px;display:block;"
+                                     onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+                                <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content:center fw-bold flex-shrink-0" style="width:42px;height:42px;display:none;flex:0 0 42px;">
+                                    <i class="fas fa-store"></i>
+                                </div>
+                            <?php else: ?>
+                                <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content:center fw-bold flex-shrink-0" style="width:42px;height:42px;">
+                                    <i class="fas fa-store"></i>
+                                </div>
+                            <?php endif; ?>
                             <div class="flex-grow-1">
                                 <div class="fw-bold"><?= esc($c['nama_produk']) ?></div>
                                 <div class="small text-muted">

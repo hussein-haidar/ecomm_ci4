@@ -1,7 +1,6 @@
 <?= view('layout_toko/v_navbar.php') ?>
 
-<body>
-    <main class="product-section">
+<main class="product-section">
         <div class="container my-5">
             <div class="produk d-flex flex-wrap align-items-center">
                 <!-- Gambar Produk -->
@@ -48,8 +47,8 @@
 
                 <!-- Detail Produk -->
                 <div class="col-md-6">
-                    <h3><strong><?= $produk['nama_produk']; ?></strong></h3>
-                    <p class="text-muted">Kategori: <?= $produk['jenis_produk']; ?></p>
+                    <h3><strong><?= esc($produk['nama_produk']) ?></strong></h3>
+                    <p class="text-muted">Kategori: <?= esc($produk['jenis_produk']) ?></p>
 
                     <!-- Ringkasan Rating -->
                     <div id="ringkasan_rating" style="margin-bottom:8px;">
@@ -57,7 +56,7 @@
                         <span id="jumlah_ulasan_header"></span>
                     </div>
 
-                    <p class="detail"><strong>Stok: </strong> <strong>Stock :</strong>
+                    <p class="detail"><strong>Stok: </strong>
                         <span id="stok-<?= esc($produk['id_stok']) ?>">
                             <?= esc($produk['jumlah_stok_produk']) ?>
                         </span>
@@ -67,23 +66,24 @@
                     <p class="detail"><strong>Deskripsi: </strong><?= $produk['deskripsi_produk']; ?></p>
 
                     <!-- Form keranjang -->
-                    <?php if ($user_logged_in): ?>
+                    <?php $stokMax = (int)($produk['total_stok'] ?? 0); ?>
+                    <?php if ($user_logged_in && $stokMax > 0): ?>
                         <?= form_open_multipart('pelanggan_kelola_data/add_to_cart'); ?>
                         <div class="form-detail-cart-wrapper d-flex flex-wrap gap-2 align-items-center">
-                            <input type="hidden" name="id_stok" value="<?= $produk['id_stok']; ?>">
-                            <input type="hidden" name="nama_produk" value="<?= $produk['nama_produk'] ?>">
-                            <input type="hidden" name="satuan_produk" value="<?= $produk['satuan_produk']; ?>">
-                            <input type="hidden" name="harga_produk" value="<?= $produk['harga_produk'] ?>">
-                            <input type="hidden" name="berat_produk" value="<?= $produk['berat_produk'] ?>">
+                            <input type="hidden" name="id_stok" value="<?= esc($produk['id_stok']) ?>">
+                            <input type="hidden" name="nama_produk" value="<?= esc($produk['nama_produk']) ?>">
+                            <input type="hidden" name="satuan_produk" value="<?= esc($produk['satuan_produk']) ?>">
+                            <input type="hidden" name="harga_produk" value="<?= esc($produk['harga_produk']) ?>">
+                            <input type="hidden" name="berat_produk" value="<?= esc($produk['berat_produk'] ?? 0) ?>">
 
                             <select id="ukuran_produk" name="ukuran_produk" style="width: auto" class="form-control profile" required>
                                 <option value="">--Pilih Ukuran--</option>
-                                <?php foreach ($produk['ukuran_list'] as $ukuran): ?>
-                                    <option value=" <?= esc($ukuran) ?>"><?= esc($ukuran) ?></option>
+                                <?php foreach ($produk['ukuran_list'] ?? [] as $ukuran): ?>
+                                    <option value="<?= esc(trim($ukuran)) ?>"><?= esc(trim($ukuran)) ?></option>
                                 <?php endforeach; ?>
                             </select>
 
-                            <input type="number" name="jumlah_produk" min="1" value="1" max="<?= $produk['total_stok']; ?>" style="width: auto" class="form-control profile">
+                            <input type="number" name="jumlah_produk" min="1" value="1" max="<?= $stokMax ?>" style="width: auto" class="form-control profile">
                             <button type="submit" class="btn btn-danger">
                                 <i class="fas fa-shopping-cart"></i>&nbsp;Keranjang
                             </button>
@@ -91,23 +91,25 @@
                         <?= form_close(); ?>
                     <?php else: ?>
                         <div class="form-detail-cart-wrapper d-flex flex-wrap gap-2 align-items-center">
-                            <?php if (isset($produk['ukuran_list'])): ?>
+                            <?php if (!empty($produk['ukuran_list'])): ?>
                                 <select name="ukuran_produk" id="ukuran_produk" style="width: auto;" class="form-control profile" disabled>
                                     <option>--Pilih Ukuran--</option>
-                                    <?php foreach ($produk['ukuran_list'] as $ukuran): ?>
-                                        <option value="<?= esc($ukuran) ?>"><?= esc($ukuran) ?></option>
+                                    <?php foreach ($produk['ukuran_list'] ?? [] as $ukuran): ?>
+                                        <option value="<?= esc(trim($ukuran)) ?>"><?= esc(trim($ukuran)) ?></option>
                                     <?php endforeach; ?>
                                 </select>
                             <?php endif; ?>
-                            <input type="number" min="1" value="1" max="<?= $produk['total_stok']; ?>" style="width: 100px;" class="form-control profile" disabled>
-                            <button type="button" class="btn btn-danger" disabled>
+                            <?php if ($stokMax > 0): ?>
+                                <input type="number" min="1" value="1" max="<?= $stokMax ?>" style="width: 100px;" class="form-control profile" disabled>
+                            <?php endif; ?>
+                            <button type="button" class="btn btn-danger" <?= $stokMax > 0 ? '' : 'disabled' ?>>
                                 <i class="fas fa-shopping-cart"></i>&nbsp;Keranjang
                             </button>
                         </div>
                     <?php endif; ?>
                     <?php if ($user_logged_in): ?>
                         <div class="mt-3">
-                            <a href="#" onclick="bukaChatProduk(event, <?= esc(json_encode($produk['nama_produk']), 'attr') ?>, <?= (int)$produk['id_stok'] ?>)" class="btn btn-outline-primary">
+                            <a href="#" onclick="bukaChatProduk(event, <?= esc(json_encode($produk['nama_produk']), 'attr') ?>, <?= (int)$produk['id_stok'] ?>, <?= esc(json_encode($produk['foto_produk'] ?? ''), 'attr') ?>)" class="btn btn-outline-primary">
                                 <i class="fas fa-comments"></i>&nbsp;Chat Penjual
                             </a>
                         </div>

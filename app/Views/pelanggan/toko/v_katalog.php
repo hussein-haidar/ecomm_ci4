@@ -1,79 +1,31 @@
 <?= view('layout_toko/v_navbar.php') ?>
 
-<body>
-    <!-- Product Section with Sidebar -->
-    <main class="product-section katalog-page">
-        <div class="katalog-container">
-            <!-- Sidebar Filter (Desktop: always visible, Mobile: slide-in) -->
-            <aside class="filter-sidebar-desktop" id="filterSidebar">
-                <?= view('layout_toko/v_filter_sidebar', [
-                    'filter_params' => $filter_params ?? [],
-                    'jenis_produk_dropdown' => $jenis_produk_dropdown ?? [],
-                    'is_desktop' => true
-                ]) ?>
-            </aside>
+<!-- Products Section -->
+<main class="catalog-section">
+    <?= view('layout_toko/v_filter_sidebar.php', ['is_desktop' => true]) ?>
 
-            <!-- Mobile Overlay -->
-            <div class="filter-overlay" id="filterOverlay" aria-hidden="true"></div>
-
-            <!-- Product Grid -->
-            <div class="katalog-content">
-                <div class="katalog-header">
-                    <h3 class="katalog-title">Katalog Produk</h3>
-                </div>
-                <div class="product-grid">
-                    <?= view('layout_toko/v_produk.php') ?>
-                </div>
+    <div class="flex-grow-1">
+        <div class="catalog-header d-flex flex-wrap justify-content-between align-items-end gap-2 mb-4">
+            <div>
+                <h2 class="catalog-title mb-1">Katalog Produk</h2>
+                <p class="catalog-subtitle text-muted mb-0">
+                    <?= count($produk_data ?? []) ?> produk tersedia
+                    <?php if (!empty($filter_params['keyword'] ?? '')): ?>
+                        · hasil pencarian &ldquo;<?= esc($filter_params['keyword']) ?>&rdquo;
+                    <?php endif; ?>
+                </p>
+            </div>
+            <div class="catalog-toolbar">
+                <button type="button" class="btn btn-outline-primary btn-sm d-lg-none" onclick="document.getElementById('filterSidebar').scrollIntoView({behavior:'smooth',block:'start'})">
+                    <i class="fas fa-filter me-1"></i>Filter
+                </button>
             </div>
         </div>
-    </main>
 
-    <script>
-        // Mobile filter sidebar toggle
-        (function() {
-            const filterSidebar = document.getElementById('filterSidebar');
-            const filterOverlay = document.getElementById('filterOverlay');
-            const closeFilterSidebar = document.getElementById('closeFilterSidebar');
+        <div class="product-grid">
+            <?= view('layout_toko/v_produk_grid.php', ['produk_data' => $produk_data ?? []]) ?>
+        </div>
+    </div>
+</main>
 
-            function openFilterSidebar() {
-                filterSidebar.classList.add('active');
-                filterOverlay.classList.add('active');
-                document.body.style.overflow = 'hidden';
-            }
-
-            function closeFilterSidebarFunc() {
-                filterSidebar.classList.remove('active');
-                filterOverlay.classList.remove('active');
-                document.body.style.overflow = '';
-            }
-
-            // Open from toggle button
-            document.addEventListener('click', function(e) {
-                const btn = e.target.closest('[data-filter-toggle]');
-                if (btn) {
-                    e.preventDefault();
-                    openFilterSidebar();
-                }
-            });
-
-            if (closeFilterSidebar) {
-                closeFilterSidebar.addEventListener('click', closeFilterSidebarFunc);
-            }
-            if (filterOverlay) {
-                filterOverlay.addEventListener('click', closeFilterSidebarFunc);
-            }
-
-            // Rating filter
-            window.setRatingFilter = function(btn, rating) {
-                document.querySelectorAll('.star-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                document.getElementById('rating_min').value = rating;
-            };
-
-            window.clearRatingFilter = function() {
-                document.querySelectorAll('.star-btn').forEach(b => b.classList.remove('active'));
-                document.getElementById('rating_min').value = '';
-            };
-        })();
-    </script>
 <?= view('layout_toko/v_footer.php') ?>

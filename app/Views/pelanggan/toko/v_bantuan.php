@@ -47,7 +47,7 @@
 
                 <?php foreach ($faq_groups as $category => $items): ?>
                     <?php foreach ($items as $index => $faq): ?>
-                        <div class="accordion-item faq-item" data-category="<?= $category ?>">
+                        <div class="accordion-item faq-item" data-category="<?= esc($category) ?>">
                             <h2 class="accordion-header" id="heading<?= ucfirst($category) ?><?= $index + 1 ?>">
                                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse<?= ucfirst($category) ?><?= $index + 1 ?>" aria-expanded="false" aria-controls="collapse<?= ucfirst($category) ?><?= $index + 1 ?>">
                                     <?= esc($faq['q']) ?>

@@ -37,6 +37,45 @@
     </a>
   </div>
 
+  <?php if (!empty($produk) && !empty($produk['nama_produk'])): ?>
+  <div class="box-body" style="padding:12px 15px 0;">
+    <div style="display:flex;align-items:center;gap:12px;background:#fff;border:1px solid #e5e5e5;border-radius:8px;overflow:hidden;box-shadow:0 1px 1px rgba(0,0,0,0.02);">
+      <div style="display:flex;align-items:center;gap:5px;padding:5px 12px;background:#e8f4ff;border-right:1px solid #d6e9f8;">
+        <i class="fa fa-question-circle" style="color:#3c8dbc;"></i>
+        <span style="color:#3c8dbc;font-weight:600;font-size:12px;">Menanyakan produk ini</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;padding:10px 12px;flex:1;min-width:0;">
+        <div style="width:56px;height:56px;flex:0 0 56px;">
+          <?php if (!empty($produk['foto_produk'])): ?>
+            <img src="<?= base_url('fotoproduk/' . $produk['foto_produk']) ?>"
+                 alt="<?= esc($produk['nama_produk']) ?>"
+                 style="width:100%;height:100%;object-fit:cover;border-radius:6px;border:1px solid #eee;"
+                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+          <?php endif; ?>
+          <div style="width:100%;height:100%;display:<?= !empty($produk['foto_produk']) ? 'none' : 'flex' ?>;align-items:center;justify-content:center;background:#f0f0f0;border-radius:6px;">
+            <i class="fa fa-box text-muted"></i>
+          </div>
+        </div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-weight:600;font-size:14px;color:#333;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+            <?= esc($produk['nama_produk']) ?>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:2px;">
+            <span style="color:#dd4b39;font-weight:700;">Rp <?= number_format($produk['harga_produk'] ?? 0, 0, ',', '.') ?></span>
+            <?php if (!empty($produk['ukuran_produk'])): ?>
+              <span style="color:#999;font-size:12px;">| <?= esc($produk['ukuran_produk']) ?></span>
+            <?php endif; ?>
+          </div>
+        </div>
+        <a href="<?= base_url('home_toko/detail_produk/' . urlencode($produk['nama_produk'])) ?>"
+           target="_blank" class="btn btn-sm btn-default">
+          <i class="fa fa-external-link"></i> Lihat Produk
+        </a>
+      </div>
+    </div>
+  </div>
+  <?php endif; ?>
+
   <div class="box-body">
     <div id="chat-box" class="chat-box">
       <div class="text-center text-muted py-4"><i class="fa fa-spinner fa-spin"></i> Memuat pesan...</div>

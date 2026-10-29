@@ -175,8 +175,8 @@
     <?php if (session()->get('user_logged_in')): ?>
     <script>
     (function() {
-        var timeoutMinutes = 15;
-        var warningMinutes = 1;
+        var timeoutMinutes = 1440;
+        var warningMinutes = 10;
         var logoutUrl = "<?= base_url('auth/logout_user') ?>";
         var timeout, warningTimeout, countdownInterval;
         var countdown = warningMinutes * 60;

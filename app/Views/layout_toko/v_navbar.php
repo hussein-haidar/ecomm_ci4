@@ -10,7 +10,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="<?= base_url() ?>/template_admin/dist/css/AdminLTE.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="<?= base_url('themes/' . ($tokoData['tema_website'] ?? 'default') . '/css/toko.css?v=20260923b') ?>">
+    <?php $tokoDataNav = get_data_toko(); ?>
+    <link rel="stylesheet" href="<?= base_url('themes/' . ($tokoDataNav['tema_website'] ?? 'default') . '/css/toko.css?v=20261029a') ?>">
     <link href="<?= base_url() ?>/icon/gudang.ico" rel="shortcut icon">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
     <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css">
@@ -64,7 +65,7 @@ if (!empty($sesiUserToko)) {
     $jenis_produk_dropdown = $produkModel->getJenisProdukDropdown($sesiUserToko);
 }
 
-if (!empty($nama_pelanggan)) {
+if (!empty($nama_pelanggan) && !empty($sesiUserToko)) {
     $keranjangModel = new \App\Models\M_pelanggan_keranjang();
     $keranjang = $keranjangModel->get_keranjang($sesiUserToko);
     $jumlahBarang = count($keranjang);
@@ -115,8 +116,8 @@ if (!empty($nama_pelanggan)) {
         </button>
         <?php endif; ?>
 
-        <!-- Hamburger Menu -->
-        <button class="btn-menu-toggle" id="btnMenuToggle" aria-label="Buka menu" aria-expanded="false" aria-controls="mainNav">
+        <!-- Hamburger Menu (Mobile only) -->
+        <button class="btn-menu-toggle d-md-none" id="btnMenuToggle" aria-label="Buka menu" aria-expanded="false" aria-controls="mainNav">
             <span class="hamburger"></span>
         </button>
 
@@ -189,8 +190,8 @@ if (!empty($nama_pelanggan)) {
         </div>
     </div>
 
-    <!-- Desktop Navigation Menu -->
-    <nav class="header-nav" aria-label="Menu utama">
+    <!-- Desktop Navigation Menu (Desktop only) -->
+    <nav class="header-nav d-none d-md-flex" aria-label="Menu utama">
         <ul class="header-nav-list">
             <li class="header-nav-item">
                 <a href="<?= base_url('home_toko/index') ?>" class="header-nav-link">
@@ -504,3 +505,8 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
+
+<!-- Bootstrap Bundle JS (wajib untuk modal) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,7 +1,6 @@
- <?= view('layout_toko/v_navbar.php') ?>
+<?= view('layout_toko/v_navbar.php') ?>
 
- <body>
-     <!-- Product Section -->
+<!-- Product Section -->
      <main class="product-section">
          <div class="container my-4">
              <div class="d-flex flex-wrap align-items-center justify-content-between mb-3">
@@ -46,7 +45,7 @@
                                              <img src="<?= base_url('fotoproduk/' . $value['foto_produk']) ?>" class="rounded border" width="60" height="60" style="object-fit:cover;" alt="Produk">
                                              <div>
                                                  <div class="fw-bold"><?= esc($value['nama_produk']) ?></div>
-                                                  <a href="#" onclick="bukaChatProduk(event, <?= esc(json_encode($value['nama_produk']), 'attr') ?>, <?= (int)$value['id_stok'] ?>)" class="btn btn-sm btn-outline-info mt-1">
+                                                  <a href="#" onclick="bukaChatProduk(event, <?= esc(json_encode($value['nama_produk']), 'attr') ?>, <?= (int)$value['id_stok'] ?>, <?= esc(json_encode($value['foto_produk'] ?? ''), 'attr') ?>)" class="btn btn-sm btn-outline-info mt-1">
                                                       <i class="fas fa-comments"></i>&nbsp;Chat Penjual
                                                   </a>
                                              </div>

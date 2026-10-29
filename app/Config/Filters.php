@@ -25,6 +25,7 @@ class Filters extends BaseConfig
 		'filter_toko' => \App\Filters\Filter_toko::class,
 		'filter_superadmin' => \App\Filters\Filter_superadmin::class,
 		'filter_toko_aktif' => \App\Filters\Filter_toko_aktif::class,
+		'filter_idle_enforce' => \App\Filters\Filter_idle_enforce::class,
 	];
 
 	/**
@@ -44,6 +45,14 @@ class Filters extends BaseConfig
 					'pelanggan_kelola_data/midtrans_notification', // Webhook Midtrans
 					'api_store',       // REST API (key-based, tanpa CSRF)
 					'api_store/*',     // REST API (key-based, tanpa CSRF)
+				],
+			],
+			// Enforce idle auto-logout di server (pembeli 10 menit, staff 1 hari)
+			'filter_idle_enforce' => [
+				'except' => [
+					'auth', 'auth/*',            // halaman login tidak boleh di-flush
+					'api_store', 'api_store/*',  // REST key-based
+					'pelanggan_kelola_data/midtrans_notification', // webhook
 				],
 			],
 			'filter_toko' => [

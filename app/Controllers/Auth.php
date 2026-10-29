@@ -452,6 +452,7 @@ class Auth extends BaseController
                         'level' => $user['level'],
                         'user_logged_in' => true,
                         'last_login' => $user['last_login'],
+                        'login_expires_at' => date('Y-m-d H:i:s', strtotime('+24 hours')),
                     ];
 
                     session()->set('log', true);
@@ -546,8 +547,9 @@ class Auth extends BaseController
                         'jobdesk_user' => $user['jobdesk_user'],
                         'foto_user' => $user['foto_user'],
                         'level' => $user['level'],
-                        'user_logged_in'     => true,
+                        'user_logged_in' => true,
                         'last_login' => $user['last_login'],
+                        'login_expires_at' => date('Y-m-d H:i:s', strtotime('+24 hours')),
                     ];
 
                     session()->set('log', true);
@@ -784,6 +786,7 @@ class Auth extends BaseController
                         'nama_kota' => $user['nama_kota'] ?? '',
                         'user_logged_in'     => true,
                         'last_login' => $user['last_login'],
+                        'login_expires_at' => date('Y-m-d H:i:s', strtotime('+24 hours')),
                     ];
 
                     session()->set('log', true);
@@ -1008,6 +1011,7 @@ session()->setFlashdata('pesan_welcome', 'Selamat Datang, ' . $user['nama_pelang
             'nama_kota'       => $pelanggan['nama_kota'] ?? '',
             'user_logged_in'  => true,
             'last_login'      => $pelanggan['last_login'],
+            'login_expires_at' => date('Y-m-d H:i:s', strtotime('+24 hours')),
         ];
 
         session()->set('log', true);

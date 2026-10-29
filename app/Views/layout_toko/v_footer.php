@@ -64,8 +64,8 @@
       </div>
       <div class="footer-extra">
         <?php if ($ft_wa_link !== '#') : ?>
-          <a href="<?= $ft_wa_link ?>" target="_blank" style="display:inline-flex;align-items:center;gap:8px;background:rgba(37,211,102,0.15);border:1px solid rgba(37,211,102,0.4);color:#7ee2a6;border-radius:10px;padding:8px 14px;text-decoration:none;font-weight:600;font-size:14px;margin-top:12px;">
-            <i class="fab fa-whatsapp" style="font-size:18px;"></i> Chat WhatsApp
+          <a href="<?= $ft_wa_link ?>" target="_blank" class="footer-wa-btn">
+            <i class="fab fa-whatsapp"></i> Chat WhatsApp
           </a>
         <?php endif; ?>
       </div>
@@ -92,10 +92,6 @@
         }
     });
 </script>
-
-</body>
-
-</html>
 
 <!-- Bootstrap  -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -157,39 +153,15 @@
         });
     });
 
-    // Toggle input pencarian dan ikon pencarian
-    function toggleSearchBar() {
-        const searchInput = document.querySelector('.search-input');
-        const searchIcon = document.querySelector('.search-icon');
-
-        searchInput.classList.toggle('active');
-
-        // Sembunyikan ikon jika input aktif, tampilkan kembali jika tidak
-        searchIcon.style.display = searchInput.classList.contains('active') ? 'none' : 'block';
-    }
-
-    // Preview gambar saat upload
-    function bacaGambar(input) {
-        if (input.files && input.files[0]) {
-            var reader = new FileReader();
-            reader.onload = function(e) {
-                $('#gambar_load').attr('src', e.target.result);
-            }
-            reader.readAsDataURL(input.files[0]);
-        }
-    }
-
-    $('#preview_gambar').change(function() {
-        bacaGambar(this);
-    });
-
     // Toggle show/hide password
     function myFunction() {
         var x = document.getElementById("ShowPass");
-        if (x.type === "password") {
-            x.type = "text";
-        } else {
-            x.type = "password";
+        if (x) {
+            if (x.type === "password") {
+                x.type = "text";
+            } else {
+                x.type = "password";
+            }
         }
     }
 
@@ -557,44 +529,55 @@ function clearRatingFilter() {
 <script>
     <?php if (session()->get('user_logged_in')): ?>
     (function() {
-        var timeoutMinutes = 15;
-        var warningMinutes = 1;
-        var logoutUrl = "<?= base_url('auth/logout_pelanggan') ?>";
+        var userLevel = <?= json_encode(session()->get('level') ?? 'null') ?>;
+        // Batas idle per role
+        // Level 3 (pelanggan): 10 menit = 600s, warning 30 detik
+        // Level 0,1,2 (admin/superadmin/pemilik): 1 ngày = 86400s, warning 30 detik
+        var idleLimitSec = userLevel === 3 || userLevel === '3' ? 600 : 86400;
+        var warningSec = 30;
+        var logoutUrl = userLevel === 3 || userLevel === '3' 
+            ? "<?= base_url('auth/logout_pelanggan') ?>" 
+            : "<?= base_url('auth/logout_user') ?>";
+        
         var timeout, warningTimeout, countdownInterval;
-        var countdown = warningMinutes * 60;
+        var remaining = warningSec;
 
         function resetTimer() {
             clearTimeout(timeout);
             clearTimeout(warningTimeout);
             clearInterval(countdownInterval);
-            countdown = warningMinutes * 60;
-            timeout = setTimeout(function() {
+            remaining = warningSec;
+
+            // Schedule warning
+            warningTimeout = setTimeout(function() {
                 showWarning();
-            }, timeoutMinutes * 60 * 1000);
+            }, (idleLimitSec - warningSec) * 1000);
+
+            // Schedule full logout
+            timeout = setTimeout(function() {
+                performLogout();
+            }, idleLimitSec * 1000);
         }
 
         function showWarning() {
-            countdown = warningMinutes * 60;
+            remaining = warningSec;
             Swal.fire({
                 title: 'Sesi Akan Berakhir!',
-                html: 'Anda akan logout otomatis dalam <strong id="countdown-timer">1:00</strong> menit.<br>Klik tombol di bawah untuk tetap login.',
+                html: 'Sesi Anda akan expired dalam <strong id="countdown-timer">' + warningSec + '</strong> detik.<br>Klik "Perpanjang" untuk tetap login.',
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
                 cancelButtonColor: '#d33',
-                confirmButtonText: 'Tetap Login',
+                confirmButtonText: 'Perpanjang',
                 cancelButtonText: 'Logout',
                 allowOutsideClick: false,
                 allowEscapeKey: false,
-                timer: warningMinutes * 60 * 1000,
+                timer: warningSec * 1000,
                 timerProgressBar: true,
                 willOpen: function() {
-                    var timerEl = document.getElementById('countdown-timer');
                     countdownInterval = setInterval(function() {
-                        countdown--;
-                        var mins = Math.floor(countdown / 60);
-                        var secs = countdown % 60;
-                        timerEl.textContent = mins + ':' + (secs < 10 ? '0' : '') + secs;
+                        remaining--;
+                        document.getElementById('countdown-timer').textContent = remaining;
                     }, 1000);
                 },
                 preConfirm: function() {
@@ -602,11 +585,16 @@ function clearRatingFilter() {
                 }
             }).then(function(result) {
                 if (result.dismiss === Swal.DismissReason.timer || result.isDismissed) {
-                    window.location.href = logoutUrl;
+                    performLogout();
                 } else if (result.isConfirmed) {
                     resetTimer();
                 }
             });
+        }
+
+        function performLogout() {
+            clearInterval(countdownInterval);
+            window.location.href = logoutUrl;
         }
 
         ['mousemove', 'keypress', 'click', 'scroll', 'touchstart'].forEach(function(evt) {
@@ -617,3 +605,6 @@ function clearRatingFilter() {
     })();
     <?php endif; ?>
 </script>
+
+</body>
+</html>
