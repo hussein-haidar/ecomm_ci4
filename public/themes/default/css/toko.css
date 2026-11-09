@@ -42,6 +42,18 @@
         border: none;
         padding: 16px 0;
     }
+
+    /* Mobile: konten filter default hidden, hanya tampil saat tombol Filter diklik */
+    #filterSidebarWrapper:not([data-open="true"]) {
+        display: none;
+    }
+}
+
+@media (min-width: 992px) {
+    /* Desktop: selalu tampil, abaikan state hidden */
+    #filterSidebarWrapper {
+        display: block !important;
+    }
 }
 
 /* Product grid - CSS Grid */

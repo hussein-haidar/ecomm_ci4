@@ -101,7 +101,7 @@ if (!empty($nama_pelanggan) && !empty($sesiUserToko)) {
         </div>
 
         <!-- Mobile Search Toggle -->
-        <button class="btn-search-toggle" id="btnSearchToggle" aria-label="Buka pencarian" aria-expanded="false">
+        <button class="btn-search-toggle d-lg-none" id="btnSearchToggle" aria-label="Buka pencarian" aria-expanded="false">
             <i class="fas fa-search"></i>
         </button>
 
@@ -502,6 +502,30 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             this.closest('form').submit();
         });
+    });
+
+    // Tutup filter sidebar — MOBILE SAJA (desktop tidak punya tombol X)
+    document.getElementById('closeFilterSidebar')?.addEventListener('click', function() {
+        const wrapper = document.getElementById('filterSidebarWrapper');
+        if (!wrapper) return;
+        wrapper.removeAttribute('data-open');
+    });
+
+    // Buka filter sidebar (mobile: set data-open + scroll ke sidebar)
+    document.getElementById('btnOpenFilterSidebar')?.addEventListener('click', function() {
+        const sidebar = document.getElementById('filterSidebar');
+        const wrapper = document.getElementById('filterSidebarWrapper');
+        if (!sidebar || !wrapper) return;
+        wrapper.setAttribute('data-open', 'true');
+        sidebar.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+
+    // Setelah submit form filter (mobile), tutup panel secara otomatis
+    document.getElementById('product-filter-form')?.addEventListener('submit', function() {
+        const wrapper = document.getElementById('filterSidebarWrapper');
+        if (wrapper && window.innerWidth < 992) {
+            wrapper.removeAttribute('data-open');
+        }
     });
 });
 </script>

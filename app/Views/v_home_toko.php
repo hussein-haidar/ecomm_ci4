@@ -31,7 +31,7 @@
                 </p>
             </div>
             <div class="catalog-toolbar">
-                <button type="button" class="btn btn-outline-primary btn-sm d-lg-none" onclick="document.getElementById('filterSidebar').scrollIntoView({behavior:'smooth',block:'start'})">
+                <button type="button" class="btn btn-outline-primary btn-sm d-lg-none" id="btnOpenFilterSidebar">
                     <i class="fas fa-filter me-1"></i>Filter
                 </button>
             </div>
